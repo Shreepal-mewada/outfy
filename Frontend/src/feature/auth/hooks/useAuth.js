@@ -1,4 +1,4 @@
-import { register, login } from "../service/auth.api";
+import { register, login, googleLogin } from "../service/auth.api";
 import { setLoading, setUser } from "../state/auth.slice";
 import { useDispatch } from "react-redux";
 
@@ -31,7 +31,21 @@ export function useAuth() {
     }
   }
 
-  return { handleRegister };
+  async function handleGoogleAuth(token) {
+    dispatch(setLoading(true));
+    try {
+      const response = await googleLogin(token);
+      dispatch(setUser(response.user));
+      return { success: true };
+    } catch (error) {
+      console.error("Google logic failed:", error);
+      return { success: false, error: error?.message || "Google Authentication failed" };
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }
+
+  return { handleRegister, handleGoogleAuth };
 }
 
 export function useLogin() {
@@ -51,5 +65,19 @@ export function useLogin() {
     }
   }
 
-  return { handleLogin };
+  async function handleGoogleAuth(token) {
+    dispatch(setLoading(true));
+    try {
+      const response = await googleLogin(token);
+      dispatch(setUser(response.user));
+      return { success: true };
+    } catch (error) {
+      console.error("Google logic failed:", error);
+      return { success: false, error: error?.message || "Google Authentication failed" };
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }
+
+  return { handleLogin, handleGoogleAuth };
 }

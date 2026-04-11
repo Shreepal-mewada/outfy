@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const bseURL = axios.create({
-  baseURL: "http://localhost:3000/auth",
+  baseURL: "http://localhost:3000/api/auth",
   withCredentials: true,
 });
 
@@ -34,3 +34,12 @@ export async function login({ email, password }) {
     throw error.response.data;
   } 
 }
+
+export async function googleLogin(token) {
+  try {
+    const response = await bseURL.post("/google", { token });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}

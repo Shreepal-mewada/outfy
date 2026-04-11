@@ -71,3 +71,53 @@ export async function loginUser(req, res) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 }
+
+export async function googleAuth(req, res) {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ message: "Google token is required" });
+    }
+
+    const googleRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!googleRes.ok) {
+      return res.status(401).json({ message: "Invalid Google token" });
+    }
+
+    const userData = await googleRes.json();
+    const { email, name } = userData;
+
+    let user = await userModel.findOne({ email });
+
+    if (!user) {
+      user = await userModel.create({
+        email,
+        fullname: name,
+        authProvider: "google",
+      });
+      await user.save();
+    }
+
+    const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.cookie("token", jwtToken);
+    res.status(200).json({
+      message: "Google Login successful",
+      user: {
+        id: user._id,
+        email: user.email,
+        fullname: user.fullname,
+        contact: user.contact,
+        role: user.role,
+      },
+      token: jwtToken,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}

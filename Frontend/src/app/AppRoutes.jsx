@@ -1,6 +1,14 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import Register from "../feature/auth/pages/Register";
 import Login from "../feature/auth/pages/Login";
+
+const ProtectedAuthRoute = ({ children }) => {
+  const hasToken = document.cookie.includes("token=");
+  if (hasToken) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
 
 export const routes = createBrowserRouter([
   {
@@ -9,10 +17,18 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/register",
-    element: <Register />,
+    element: (
+      <ProtectedAuthRoute>
+        <Register />
+      </ProtectedAuthRoute>
+    ),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <ProtectedAuthRoute>
+        <Login />
+      </ProtectedAuthRoute>
+    ),
   },
 ]);

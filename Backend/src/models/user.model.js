@@ -13,23 +13,28 @@ const userSchema = new mongoose.Schema(
     },
     contact: {
       type: String,
-      required: true,
+      required: function() { return this.authProvider !== 'google'; },
     },
     password: {
       type: String,
-      required: true,
+      required: function() { return this.authProvider !== 'google'; },
     },
     role: {
       type: String,
       enum: ["buyer", "seller"],
       default: "buyer",
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
   },
   { timestamps: true },
 );
 
 userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+  if (!this.isModified("password") || !this.password) return;
 
   const hash = await bcrypt.hash(this.password, 10);
   this.password = hash;
