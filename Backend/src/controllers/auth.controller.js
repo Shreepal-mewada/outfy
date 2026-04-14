@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
+import ProductModel from "../models/product.model.js";
 
 export async function registerUser(req, res) {
   try {
@@ -121,6 +122,26 @@ export async function googleAuth(req, res) {
       },
       token: jwtToken,
     });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
+
+export async function logoutUser(req, res) {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logout successful" });
+}
+
+export async function getAllProducts(req, res) {
+  try {
+    const products = await ProductModel.find().select("-password");
+    // const sellername = await userModel
+    //   .findById(products._id)
+
+    // console.log(sellername.fullname);
+    res
+      .status(200)
+      .json({ message: "Products fetched successfully", products });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
