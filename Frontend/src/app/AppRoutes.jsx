@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import Register from "../feature/auth/pages/Register";
 import Login from "../feature/auth/pages/Login";
+import Hero from "../components/Hero";
 
 const ProtectedAuthRoute = ({ children }) => {
   const hasToken = document.cookie.includes("token=");
@@ -13,7 +14,7 @@ const ProtectedAuthRoute = ({ children }) => {
 export const routes = createBrowserRouter([
   {
     path: "/",
-    element: <h1 className="bg-red-300">Hello world</h1>,
+    element: <Hero />,
   },
   {
     path: "/register",
