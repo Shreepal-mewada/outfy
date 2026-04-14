@@ -1,5 +1,6 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import config from "../config/config.js";
 
 export async function registerUser(req, res) {
   try {
@@ -12,26 +13,26 @@ export async function registerUser(req, res) {
         .status(400)
         .json({ message: "User with this email or contact already exists" });
     }
-    const newUser = await userModel.create({
+    const user = await userModel.create({
       email,
       password,
       fullname,
       contact,
       role: isSeller ? "seller" : "buyer",
     });
-    await newUser.save();
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+
+    const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
       expiresIn: "1h",
     });
     res.cookie("token", token);
     res.status(201).json({
       message: "User registered successfully",
       user: {
-        id: newUser._id,
-        email: newUser.email,
-        fullname: newUser.fullname,
-        contact: newUser.contact,
-        role: newUser.role,
+        id: user._id,
+        email: user.email,
+        fullname: user.fullname,
+        contact: user.contact,
+        role: user.role,
       },
       token,
     });
@@ -52,7 +53,7 @@ export async function loginUser(req, res) {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
       expiresIn: "1h",
     });
     res.cookie("token", token);
@@ -79,9 +80,12 @@ export async function googleAuth(req, res) {
       return res.status(400).json({ message: "Google token is required" });
     }
 
-    const googleRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const googleRes = await fetch(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
 
     if (!googleRes.ok) {
       return res.status(401).json({ message: "Invalid Google token" });
@@ -101,7 +105,7 @@ export async function googleAuth(req, res) {
       await user.save();
     }
 
-    const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const jwtToken = jwt.sign({ userId: user._id }, config.JWT_SECRET, {
       expiresIn: "1h",
     });
 
