@@ -21,6 +21,6 @@ router.post(
   createProduct,
 );
 
-router.get("/get-me", authProduct, getMyProducts);
+router.get("/get-seller-products", authProduct, getMyProducts);
 
 export default router;

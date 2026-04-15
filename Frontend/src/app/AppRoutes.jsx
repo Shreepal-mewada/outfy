@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router";
 import Register from "../feature/auth/pages/Register";
 import Login from "../feature/auth/pages/Login";
 import Hero from "../components/Hero";
+import MainSellerPage from "../feature/products/pages/MainSellerPage";
 
 const ProtectedAuthRoute = ({ children }) => {
   const hasToken = document.cookie.includes("token=");
@@ -31,5 +32,10 @@ export const routes = createBrowserRouter([
         <Login />
       </ProtectedAuthRoute>
     ),
+  },
+
+  {
+    path: "/seller",
+    element: <MainSellerPage />,
   },
 ]);

@@ -20,6 +20,7 @@ export async function register({
       password,
       isSeller,
     });
+
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -42,4 +43,4 @@ export async function googleLogin(token) {
   } catch (error) {
     throw error.response.data;
   }
-}
+}

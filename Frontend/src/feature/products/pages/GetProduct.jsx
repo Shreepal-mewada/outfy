@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router";
+import { useEffect, useState } from "react";
 
-const Hero = () => {
+function GetProduct() {
   const [scrolled, setScrolled] = useState(false);
   const [loaded, setLoaded] = useState(false);
-
   useEffect(() => {
     setLoaded(true);
     const handleScroll = () => {
@@ -13,10 +13,8 @@ const Hero = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   return (
-    <main className="relative min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans overflow-x-hidden">
-      {/* Navigation */}
+    <div>
       <nav
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
           scrolled
@@ -118,73 +116,8 @@ const Hero = () => {
           </div>
         </div>
       </nav>
-
-      {/* Main Hero Content */}
-      <div className="relative w-full h-screen flex flex-col items-center justify-center pt-16">
-        {/* Large Typography Background */}
-        <div
-          className={`absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none z-0 transition-all duration-700 ease-out transform ${loaded ? "opacity-100 scale-100" : "opacity-0 scale-35"}`}
-        >
-          <h1 className="text-[18vw] leading-none font-serif tracking-tighter text-[#EAE8E3] drop-shadow-sm whitespace-nowrap -mt-12 md:mt-0">
-            FASHION
-          </h1>
-        </div>
-
-        {/* Hero Image */}
-        <div
-          className={`relative z-10 w-[85%] md:w-[35%] h-[65%] md:h-[80%] rounded-t-full md:rounded-[4rem] overflow-hidden shadow-2xl transition-all duration-1000 ease-out transform ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-52"} hover:scale-[1.02] cursor-pointer group mt-8 md:mt-0`}
-        >
-          <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none"></div>
-          <img
-            src="/outfy-fashion-model.png"
-            alt="Fashion Model"
-            className="w-full h-full object-cover object-center grayscale-[10%] brightness-[0.95]"
-          />
-        </div>
-
-        {/* Text Block - Match Image Location (Bottom Left) */}
-        <div
-          className={`absolute bottom-6 md:bottom-20 left-4 md:left-20 z-20 max-w-sm transition-all duration-1000 delay-300 ease-out transform ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-        >
-          <div className="p-4 md:p-6 bg-[#FAF8F5]/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none rounded-2xl md:rounded-none">
-            <p className="text-sm md:text-base text-[#1A1C19] leading-relaxed mb-6 font-medium">
-              Explore our website for the best deals and a seamless online
-              shopping experience! Don't miss out on our exclusive offers and
-              amazing savings!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                to="/"
-                className="flex items-center justify-center gap-2 bg-[#827668] text-[#FFFFFF] text-[11px] uppercase tracking-[0.2em] py-3.5 px-7 rounded-full hover:bg-[#6c6155] transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg"
-              >
-                Shop Now
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
-                  />
-                </svg>
-              </Link>
-              <Link
-                to="/"
-                className="flex items-center justify-center bg-transparent border border-[#1A1C19] text-[#1A1C19] text-[11px] uppercase tracking-[0.2em] py-3.5 px-7 rounded-full hover:bg-[#1A1C19] hover:text-white transition-all duration-300 transform hover:-translate-y-1"
-              >
-                Learn More
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+    </div>
   );
-};
+}
 
-export default Hero;
+export default GetProduct;
