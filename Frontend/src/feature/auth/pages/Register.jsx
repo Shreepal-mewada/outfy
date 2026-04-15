@@ -25,7 +25,11 @@ const Register = () => {
       const response = await handleGoogleAuth(tokenResponse.access_token);
       setIsLoading(false);
       if (response && response.success) {
-        navigate("/");
+        if (response.user?.isSeller) {
+          navigate("/seller");
+        } else {
+          navigate("/");
+        }
       } else {
         setErrors({ email: response?.error || "Google login failed." });
       }
@@ -73,7 +77,11 @@ const Register = () => {
     setIsLoading(false);
 
     if (response && response.success) {
-      navigate("/");
+      if (response.user?.isSeller) {
+        navigate("/seller");
+      } else {
+        navigate("/");
+      }
     } else {
       const msg = response?.error || "Registration failed. Please try again.";
       const lowerMsg = msg.toLowerCase();

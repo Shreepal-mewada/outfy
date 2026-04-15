@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { useSelector } from "react-redux";
+import { useAuth } from "../feature/auth/hooks/useAuth";
 
 const Hero = () => {
   const [scrolled, setScrolled] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const user = useSelector((state) => state.auth?.user);
+  const { handleLogout } = useAuth();
 
   useEffect(() => {
     setLoaded(true);
@@ -54,6 +59,15 @@ const Hero = () => {
               Kids
               <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full"></span>
             </Link>
+            {(user?.isSeller || user?.role === "seller") && (
+              <Link
+                to="/seller"
+                className="text-[#827668] hover:text-[#1A1C19] transition-colors relative group font-bold tracking-widest"
+              >
+                Dashboard
+                <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#827668] transition-all duration-300 group-hover:w-full group-hover:bg-[#1A1C19]"></span>
+              </Link>
+            )}
           </div>
 
           <Link
@@ -96,25 +110,67 @@ const Hero = () => {
                 />
               </svg>
             </button>
-            <Link
-              to="/login"
-              className="hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
+
+            {user ? (
+              <div className="relative">
+                {/* Only Name shown, clickable */}
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="text-[12px] font-semibold text-[#1A1C19] uppercase tracking-wider hover:text-[#827668] transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  {user.fullname || "User"}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-4 w-4 transition-transform duration-300 ${isProfileOpen ? "rotate-180" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Profile Card Dropdown */}
+                {isProfileOpen && (
+                  <div className="absolute top-[120%] right-0 mt-3 w-56 bg-white border border-stone-200 shadow-xl rounded-2xl p-5 flex flex-col z-50">
+                    <div className="flex flex-col mb-4 border-b border-stone-100 pb-4">
+                      <span className="text-xs font-semibold text-[#1A1C19] truncate">
+                        {user.fullname}
+                      </span>
+                      <span className="text-[10px] text-stone-500 truncate mt-1">
+                        {user.email}
+                      </span>
+                      {(user.isSeller || user.role === "seller") && (
+                        <span className="mt-2 inline-flex self-start text-[8px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full uppercase tracking-widest font-bold">
+                          Seller
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full text-center text-[10px] font-bold uppercase tracking-[0.15em] bg-red-50 text-red-600 py-2.5 rounded-xl hover:bg-red-100 transition-colors duration-300 cursor-pointer"
+                    >
+                      Log out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center text-[11px] font-semibold uppercase tracking-widest text-[#1A1C19] hover:text-[#827668] transition-colors duration-300 ml-1 py-1.5 px-6 border border-[#1A1C19] rounded-full hover:border-[#827668]"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                />
-              </svg>
-            </Link>
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       </nav>

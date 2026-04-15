@@ -1,122 +1,126 @@
-import React from "react";
-import { Link } from "react-router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useProduct } from "../hooks/useProduct";
+import { motion } from "framer-motion";
 
 function GetProduct() {
-  const [scrolled, setScrolled] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const { handleGetProducts } = useProduct();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Assumes Redux state shape has a products array slice.
+  // Using a fallback for safety if Redux structure isn't entirely matched yet.
+  const reduxProducts = useSelector((state) => state.product?.products || []);
+  const [localProducts, setLocalProducts] = useState([]);
+
   useEffect(() => {
-    setLoaded(true);
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const res = await handleGetProducts();
+        // If Redux is not fully piped, we can rely on local state from the response.
+        if (res && res.products) {
+          setLocalProducts(res.products);
+        }
+      } catch (err) {
+        setError("Failed to fetch products. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    fetchProducts();
   }, []);
+
+  const displayProducts = reduxProducts.length > 0 ? reduxProducts : localProducts;
+
+  // Staggered animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+
+  if (loading) {
+    return (
+      <div className="py-20 flex justify-center">
+        <div className="w-6 h-6 border-2 border-[#1A1C19] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-20 flex justify-center">
+        <p className="text-[11px] uppercase tracking-widest text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  if (displayProducts.length === 0) {
+    return (
+      <div className="py-32 flex flex-col items-center justify-center text-center border border-dashed border-stone-300 rounded-3xl bg-white/50 backdrop-blur-sm">
+        <h3 className="font-serif text-2xl text-[#1A1C19] mb-2">No products yet.</h3>
+        <p className="text-[11px] uppercase tracking-widest text-stone-500">
+          Your active listings will appear here.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-[#FAF8F5]/90 backdrop-blur-md shadow-sm py-4"
-            : "bg-transparent py-6"
-        }`}
-      >
-        <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
-          <div className="hidden md:flex space-x-8 text-[11px] uppercase tracking-widest font-semibold text-stone-600">
-            <Link
-              to="#"
-              className="hover:text-[#1A1C19] transition-colors relative group"
-            >
-              Shop
-              <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link
-              to="#"
-              className="hover:text-[#1A1C19] transition-colors relative group"
-            >
-              Men
-              <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link
-              to="#"
-              className="hover:text-[#1A1C19] transition-colors relative group"
-            >
-              Women
-              <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link
-              to="#"
-              className="hover:text-[#1A1C19] transition-colors relative group"
-            >
-              Kids
-              <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full"></span>
-            </Link>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-50px" }}
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12"
+    >
+      {displayProducts.map((product) => (
+        <motion.div
+          key={product._id || product.id}
+          variants={itemVariants}
+          className="group cursor-pointer flex flex-col"
+        >
+          {/* Image Container with Hover Effect */}
+          <div className="relative w-full aspect-[3/4] bg-stone-100 mb-4 overflow-hidden rounded-lg">
+            <img
+              src={
+                product.images?.[0] ||
+                product.image ||
+                "/outfy-fashion-model.png"
+              }
+              alt={product.title}
+              className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+            {/* Minimal overlay on hover */}
+            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
 
-          <Link
-            to="/"
-            className="text-2xl md:text-3xl font-BlinkMacSystemFont tracking-tighter text-[#1A1C19] ml-0 md:-ml-20"
-          >
-            OUTFY<span className="text-red-500">.</span>
-          </Link>
-
-          <div className="flex space-x-5 text-stone-700">
-            <button className="hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </svg>
-            </button>
-            <button className="hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                />
-              </svg>
-            </button>
-            <Link
-              to="/login"
-              className="hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                />
-              </svg>
-            </Link>
+          {/* Product Details */}
+          <h3 className="text-sm font-medium text-[#1A1C19] truncate mb-1">
+            {product.title}
+          </h3>
+          <p className="text-[11px] uppercase tracking-widest text-stone-500 mb-2 truncate">
+            {product.description || "No description"}
+          </p>
+          <div className="flex items-center text-sm text-[#1A1C19]">
+            {product.priceCurrency || (product.price?.currency) || "INR"}
+            <span className="ml-[2px]">{product.priceAmount || (product.price?.amount) || "0.00"}</span>
           </div>
-        </div>
-      </nav>
-    </div>
+        </motion.div>
+      ))}
+    </motion.div>
   );
 }
 

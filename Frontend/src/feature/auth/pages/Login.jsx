@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useLogin } from "../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
-  const { handleLogin, handleGoogleAuth } = useLogin();
+  const { handleLogin, handleGoogleAuth } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -21,7 +21,11 @@ const Login = () => {
       const response = await handleGoogleAuth(tokenResponse.access_token);
       setIsLoading(false);
       if (response && response.success) {
-        navigate("/");
+        if (response.user?.isSeller) {
+          navigate("/seller");
+        } else {
+          navigate("/");
+        }
       } else {
         setErrors({ email: response?.error || "Google login failed." });
       }
@@ -55,7 +59,11 @@ const Login = () => {
     setIsLoading(false);
 
     if (response && response.success) {
-      navigate("/");
+      if (response.user?.isSeller) {
+        navigate("/seller");
+      } else {
+        navigate("/");
+      }
     } else {
       const msg = response?.error || "Login failed. Please try again.";
       const lowerMsg = msg.toLowerCase();

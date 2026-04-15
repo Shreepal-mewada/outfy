@@ -44,3 +44,12 @@ export async function googleLogin(token) {
     throw error.response.data;
   }
 }
+
+export async function logout() {
+  try {
+    const response = await bseURL.post("/logout");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
