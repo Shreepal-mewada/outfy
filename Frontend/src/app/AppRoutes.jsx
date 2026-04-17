@@ -5,6 +5,7 @@ import Login from "../feature/auth/pages/Login";
 import Hero from "../components/Hero";
 import MainSellerPage from "../feature/products/pages/MainSellerPage";
 import CreateProduct from "../feature/products/pages/CreateProduct";
+import EditProduct from "../feature/products/pages/EditProduct";
 
 const ProtectedAuthRoute = ({ children }) => {
   const hasToken = document.cookie.includes("token=");
@@ -63,6 +64,14 @@ export const routes = createBrowserRouter([
     element: (
       <ProtectedSellerRoute>
         <CreateProduct />
+      </ProtectedSellerRoute>
+    ),
+  },
+  {
+    path: "/seller/edit/:id",
+    element: (
+      <ProtectedSellerRoute>
+        <EditProduct />
       </ProtectedSellerRoute>
     ),
   },

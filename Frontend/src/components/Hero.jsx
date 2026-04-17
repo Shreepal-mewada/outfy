@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
 import { useAuth } from "../feature/auth/hooks/useAuth";
+import { CloudCog } from "lucide-react";
 
 const Hero = () => {
   const [scrolled, setScrolled] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const user = useSelector((state) => state.auth?.user);
+
   const { handleLogout } = useAuth();
 
   useEffect(() => {
@@ -20,14 +22,14 @@ const Hero = () => {
   }, []);
 
   return (
+
     <main className="relative min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans overflow-x-hidden">
       {/* Navigation */}
       <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled
             ? "bg-[#FAF8F5]/90 backdrop-blur-md shadow-sm py-4"
             : "bg-transparent py-6"
-        }`}
+          }`}
       >
         <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
           <div className="hidden md:flex space-x-8 text-[11px] uppercase tracking-widest font-semibold text-stone-600">
