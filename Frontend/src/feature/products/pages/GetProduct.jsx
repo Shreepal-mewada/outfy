@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router";
 import { useProduct } from "../hooks/useProduct";
 import { motion } from "framer-motion";
-import { Edit2, Trash2, Power, EyeOff } from "lucide-react";
+import { Edit2, Trash2, Power, EyeOff, Eye } from "lucide-react";
 
 function GetProduct() {
   const { handleGetProducts, handleDeleteProduct, handleToggleProductStatus } = useProduct();
@@ -30,12 +30,9 @@ function GetProduct() {
     fetchProducts();
   }, []);
 
-  const getTotalStock = (variants) => {
-    if (!variants || !Array.isArray(variants)) return 0;
-    return variants.reduce((acc, variant) => {
-      const variantStock = variant.sizes?.reduce((sum, size) => sum + (size.stock || 0), 0) || 0;
-      return acc + variantStock;
-    }, 0);
+  const getTotalStock = (sizes) => {
+    if (!sizes || !Array.isArray(sizes)) return 0;
+    return sizes.reduce((sum, size) => sum + (size.stock || 0), 0);
   };
 
   const deleteProduct = async (id) => {
@@ -82,7 +79,7 @@ function GetProduct() {
     <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
       {localProducts.map((product) => {
         const id = product._id || product.id;
-        const totalStock = getTotalStock(product.variants);
+        const totalStock = getTotalStock(product.sizes);
         const hasDiscount = product.discountPercentage > 0;
         
         return (
@@ -97,6 +94,9 @@ function GetProduct() {
 
           {/* Action Menu (Hover) */}
           <div className="absolute top-4 right-4 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Link to={`/product/${id}`} className="bg-white/90 backdrop-blur text-[#1A1C19] p-2 rounded-full shadow hover:bg-white transition flex items-center justify-center" title="Preview">
+              <Eye className="w-3 h-3" />
+            </Link>
             <button onClick={() => toggleStatus(id)} className="bg-white/90 backdrop-blur text-[#1A1C19] p-2 rounded-full shadow hover:bg-white transition" title={product.isActive ? "Deactivate" : "Activate"}>
               <Power className="w-3 h-3" />
             </button>
@@ -109,13 +109,13 @@ function GetProduct() {
           </div>
 
           {/* Image Container */}
-          <div className="relative w-full aspect-[3/4] bg-stone-100 mb-4 overflow-hidden rounded-xl">
+          <Link to={`/product/${id}`} className="block relative w-full aspect-[3/4] bg-stone-100 mb-4 overflow-hidden rounded-xl cursor-pointer">
             <img
               src={product.images?.[0]?.url || product.images?.[0] || product.image || "/outfy-fashion-model.png"}
               alt={product.title}
               className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
             />
-          </div>
+          </Link>
 
           {/* Product Details */}
           <div className="flex justify-between items-start mb-1 gap-2">

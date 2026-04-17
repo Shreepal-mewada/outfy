@@ -2,7 +2,6 @@ import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 
-
 export async function registerUser(req, res) {
   try {
     const { email, contact, fullname, password, isSeller } = req.body;
@@ -25,7 +24,13 @@ export async function registerUser(req, res) {
     const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 1000,
+      path: "/",
+    });
     res.status(201).json({
       message: "User registered successfully",
       user: {
@@ -57,7 +62,13 @@ export async function loginUser(req, res) {
     const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 1000,
+      path: "/",
+    });
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -106,11 +117,17 @@ export async function googleAuth(req, res) {
       await user.save();
     }
 
-    const jwtToken = jwt.sign({ userId: user._id }, config.JWT_SECRET, {
+    const jwtToken = jwt.sign({ id: user._id }, config.JWT_SECRET, {
       expiresIn: "1h",
     });
 
-    res.cookie("token", jwtToken);
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 1000,
+      path: "/",
+    });
     res.status(200).json({
       message: "Google Login successful",
       user: {
@@ -128,8 +145,11 @@ export async function googleAuth(req, res) {
 }
 
 export async function logoutUser(req, res) {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
   res.status(200).json({ message: "Logout successful" });
 }
-
-

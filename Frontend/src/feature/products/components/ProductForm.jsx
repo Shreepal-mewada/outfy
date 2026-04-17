@@ -33,7 +33,7 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, s
     deliveryInfo: "",
     isActive: true,
     isFeatured: false,
-    variants: [{ color: "", colorCode: "#000000", sizes: [{ size: "M", stock: 10 }] }],
+    sizes: [{ size: "M", stock: 10 }],
   });
 
   const [files, setFiles] = useState([]);
@@ -64,9 +64,9 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, s
         deliveryInfo: initialData.deliveryInfo || "",
         isActive: initialData.isActive ?? true,
         isFeatured: initialData.isFeatured ?? false,
-        variants: initialData.variants && initialData.variants.length > 0
-          ? initialData.variants
-          : prev.variants
+        sizes: initialData.sizes && initialData.sizes.length > 0
+          ? initialData.sizes
+          : prev.sizes
       }));
       if (initialData.images) {
         setExistingImages(initialData.images);
@@ -110,52 +110,26 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, s
     }));
   };
 
-  // --- Variants Handlers ---
-  const addVariant = () => {
+  // --- Sizes Handlers ---
+  const addSize = () => {
     setFormData((prev) => ({
       ...prev,
-      variants: [...prev.variants, { color: "", colorCode: "#ffffff", sizes: [{ size: "M", stock: 10 }] }],
+      sizes: [...prev.sizes, { size: "", stock: 0 }],
     }));
   };
 
-  const removeVariant = (index) => {
+  const removeSize = (index) => {
     setFormData((prev) => ({
       ...prev,
-      variants: prev.variants.filter((_, i) => i !== index),
+      sizes: prev.sizes.filter((_, i) => i !== index),
     }));
   };
 
-  const handleVariantChange = (vIndex, field, value) => {
+  const handleSizeChange = (index, field, value) => {
     setFormData((prev) => {
-      const newVariants = [...prev.variants];
-      newVariants[vIndex] = { ...newVariants[vIndex], [field]: value };
-      return { ...prev, variants: newVariants };
-    });
-  };
-
-  const addSizeToVariant = (vIndex) => {
-    setFormData((prev) => {
-      const newVariants = [...prev.variants];
-      newVariants[vIndex].sizes.push({ size: "", stock: 0 });
-      return { ...prev, variants: newVariants };
-    });
-  };
-
-  const removeSizeFromVariant = (vIndex, sIndex) => {
-    setFormData((prev) => {
-      const newVariants = [...prev.variants];
-      newVariants[vIndex].sizes = newVariants[vIndex].sizes.filter((_, i) => i !== sIndex);
-      return { ...prev, variants: newVariants };
-    });
-  };
-
-  const handleSizeChange = (vIndex, sIndex, field, value) => {
-    setFormData((prev) => {
-      const newVariants = [...prev.variants];
-      const newSizes = [...newVariants[vIndex].sizes];
-      newSizes[sIndex] = { ...newSizes[sIndex], [field]: field === "stock" ? Number(value) : value };
-      newVariants[vIndex].sizes = newSizes;
-      return { ...prev, variants: newVariants };
+      const newSizes = [...prev.sizes];
+      newSizes[index] = { ...newSizes[index], [field]: field === "stock" ? Number(value) : value };
+      return { ...prev, sizes: newSizes };
     });
   };
 
@@ -186,7 +160,7 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, s
 
     const data = new FormData();
     Object.keys(formData).forEach((key) => {
-      if (key === "variants" || key === "tags" || key === "occasion") {
+      if (key === "sizes" || key === "tags" || key === "occasion") {
         data.append(key, JSON.stringify(formData[key]));
       } else {
         data.append(key, formData[key]);
@@ -330,65 +304,41 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, s
                 </div>
               </section>
 
-              {/* Section 3: Variants */}
+              {/* Section 3: Sizes & Inventory */}
               <section className="space-y-6 bg-white p-6 rounded-2xl border border-stone-200">
-                {/* <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xs uppercase tracking-widest text-[#827668] font-bold">3. Product Variants *</h3>
-                  <button type="button" onClick={addVariant} className="text-[10px] flex items-center gap-1 uppercase tracking-widest text-[#1A1C19] hover:text-[#827668] font-bold bg-stone-100 px-3 py-1.5 rounded-full">
-                    <Plus className="w-3 h-3" /> Add Variant
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xs uppercase tracking-widest text-[#827668] font-bold">3. Sizes & Inventory *</h3>
+                  <button type="button" onClick={addSize} className="text-[10px] flex items-center gap-1 uppercase tracking-widest text-[#1A1C19] hover:text-[#827668] font-bold bg-stone-100 px-3 py-1.5 rounded-full">
+                    <Plus className="w-3 h-3" /> Add Size
                   </button>
-                </div> */}
+                </div> 
 
-                {formData.variants.map((v, vIndex) => (
-                  <div key={vIndex} className="bg-[#FAF8F5] p-5 rounded-xl border border-stone-200 relative mb-4">
-                    {formData.variants.length > 1 && (
-                      <button type="button" onClick={() => removeVariant(vIndex)} className="absolute top-4 right-4 text-red-500 hover:bg-red-50 p-1.5 rounded-full">
+                 {formData.sizes.map((s, sIndex) => (
+                  <div key={sIndex} className="bg-[#FAF8F5] p-5 rounded-xl border border-stone-200 relative mb-4">
+                    {formData.sizes.length > 1 && (
+                      <button type="button" onClick={() => removeSize(sIndex)} className="absolute top-4 right-4 text-red-500 hover:bg-red-50 p-1.5 rounded-full">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     )}
-                    <div className="flex gap-4 items-end mb-6">
-                      <div className="flex-1">
-                        <label className="block text-[10px] uppercase tracking-widest text-stone-500 mb-1">Color Name *</label>
-                        <input
-                          value={v.color} onChange={(e) => handleVariantChange(vIndex, "color", e.target.value)} required
-                          className="w-full bg-transparent border-0 border-b py-1 px-0 text-sm focus:outline-none border-stone-300 focus:border-[#7d7164]" placeholder="e.g. Navy Blue"
-                        />
-                      </div>
-                      {/* <div>
-                        <label className="block text-[10px] uppercase tracking-widest text-stone-500 mb-1">Color Hex</label>
-                        <input
-                          type="color" value={v.colorCode} onChange={(e) => handleVariantChange(vIndex, "colorCode", e.target.value)}
-                          className="w-8 h-8 rounded border-0 cursor-pointer p-0"
-                        />
-                      </div> */}
-                    </div>
-
-                    {/* Sizes */}
-                    <div className="space-y-3">
-                      <label className="block text-[10px] uppercase tracking-widest text-stone-500">Sizes & Inventory *</label>
-                      {v.sizes.map((s, sIndex) => (
-                        <div key={sIndex} className="flex gap-3 items-center">
+                    
+                    <div className="flex gap-4 items-center">
+                        <div className="flex-1">
+                          <label className="block text-[10px] uppercase tracking-widest text-stone-500 mb-1">Size *</label>
                           <select
-                            value={s.size} onChange={(e) => handleSizeChange(vIndex, sIndex, "size", e.target.value)} required
-                            className="bg-white border py-1.5 px-3 text-sm rounded-lg outline-none w-1/3"
+                            value={s.size} onChange={(e) => handleSizeChange(sIndex, "size", e.target.value)} required
+                            className="w-full bg-white border py-1.5 px-3 text-sm rounded-lg outline-none focus:border-[#7d7164]"
                           >
                             <option value="">Select Size...</option>
                             {COMMON_SIZES.map(cs => <option value={cs} key={cs}>{cs}</option>)}
                           </select>
-                          <input
-                            type="number" min="0" placeholder="StockQty" value={s.stock} onChange={(e) => handleSizeChange(vIndex, sIndex, "stock", e.target.value)} required
-                            className="bg-white border py-1 px-3 text-sm rounded-lg outline-none w-1/3"
-                          />
-                          {v.sizes.length > 1 && (
-                            <button type="button" onClick={() => removeSizeFromVariant(vIndex, sIndex)} className="text-stone-400 hover:text-red-500 p-1">
-                              <X className="w-4 h-4" />
-                            </button>
-                          )}
                         </div>
-                      ))}
-                      {/* <button type="button" onClick={() => addSizeToVariant(vIndex)} className="text-[10px] text-[#827668] hover:text-[#1A1C19] uppercase tracking-widest font-semibold pt-2">
-                      + Add Size Size
-                    </button> */}
+                        <div className="flex-1">
+                          <label className="block text-[10px] uppercase tracking-widest text-stone-500 mb-1">Stock Qty *</label>
+                          <input
+                            type="number" min="0" placeholder="Qty" value={s.stock} onChange={(e) => handleSizeChange(sIndex, "stock", e.target.value)} required
+                            className="w-full bg-white border py-1.5 px-3 text-sm rounded-lg outline-none focus:border-[#7d7164]"
+                          />
+                        </div>
                     </div>
                   </div>
                 ))}

@@ -21,7 +21,7 @@ const Login = () => {
       const response = await handleGoogleAuth(tokenResponse.access_token);
       setIsLoading(false);
       if (response && response.success) {
-        if (response.user?.isSeller) {
+        if (response.user?.role === "seller") {
           navigate("/seller");
         } else {
           navigate("/");

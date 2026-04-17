@@ -13,13 +13,13 @@ export const authProduct = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET);
 
-    const user = await userModel.findById(decoded.id);
+    const userId = decoded.id || decoded.userId;
+    const user = await userModel.findById(userId);
 
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
 
-    
     if (user.role !== "seller") {
       return res
         .status(403)
@@ -31,6 +31,7 @@ export const authProduct = async (req, res, next) => {
     // Authentication logic for product routes
     next();
   } catch (err) {
+    console.error("Auth Middleware Error:", err);
     return res.status(401).json({ message: "Invalid token" });
   }
 };
