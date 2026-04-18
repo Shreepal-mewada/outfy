@@ -107,7 +107,7 @@ const LatestProducts = () => {
     >
       {/* ── Title ── */}
       <motion.div
-        className="text-center mb-16"
+        className="text-center mb-6"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}

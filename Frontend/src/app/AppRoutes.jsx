@@ -7,6 +7,7 @@ import MainSellerPage from "../feature/products/pages/MainSellerPage";
 import CreateProduct from "../feature/products/pages/CreateProduct";
 import EditProduct from "../feature/products/pages/EditProduct";
 import ProductDetails from "../feature/products/pages/ProductDetails";
+import AllProducts from "../feature/products/pages/AllProducts";
 
 const ProtectedAuthRoute = ({ children }) => {
   const hasToken = document.cookie.includes("token=");
@@ -34,6 +35,10 @@ export const routes = createBrowserRouter([
   {
     path: "/",
     element: <Hero />,
+  },
+  {
+    path: "/products",
+    element: <AllProducts />,
   },
   {
     path: "/register",
@@ -79,9 +84,10 @@ export const routes = createBrowserRouter([
   {
     path: "/product/:id",
     element: (
-      <ProtectedSellerRoute>
-        <ProductDetails />
-      </ProtectedSellerRoute>
+      // <ProtectedSellerRoute>
+      //   <ProductDetails />
+      // </ProtectedSellerRoute>
+      <ProductDetails />
     ),
   },
 ]);
