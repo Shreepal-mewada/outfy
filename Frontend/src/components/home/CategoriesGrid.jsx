@@ -7,34 +7,26 @@ const categories = [
   {
     title: "Kids",
     subtitle: "For everyone",
-    image:
-      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80",
-    link: "/category/kids",
-    span: "col-span-1 row-span-2", // tall left card
+    image: "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80",
+    link: "/products?category=Kids",
   },
   {
     title: "Men",
     subtitle: "Sharp & refined",
-    image:
-      "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&q=80",
-    link: "/category/men",
-    span: "col-span-1 row-span-1",
+    image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&q=80",
+    link: "/products?category=Men",
   },
   {
     title: "Women",
     subtitle: "Effortlessly chic",
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
-    link: "/category/women",
-    span: "col-span-1 row-span-1",
+    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
+    link: "/products?category=Women",
   },
   {
     title: "Unisex",
     subtitle: "Playful & bright",
-    image:
-      "https://images.unsplash.com/photo-1519238396346-630e665977a4?w=800&q=80",
-    link: "/category/unisex",
-    span: "col-span-1 row-span-1",
+    image: "https://images.unsplash.com/photo-1519238396346-630e665977a4?w=800&q=80",
+    link: "/products?category=Unisex",
   },
 ];
 

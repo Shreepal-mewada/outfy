@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { useSelector } from "react-redux";
 import { useAuth } from "../feature/auth/hooks/useAuth";
 import { CloudCog } from "lucide-react";
-
+import { useNavigate } from "react-router";
 import LatestProducts from "./home/LatestProducts";
 import FeaturesRow from "./home/FeaturesRow";
 import CategoriesGrid from "./home/CategoriesGrid";
@@ -19,7 +19,7 @@ const Hero = () => {
   const [loaded, setLoaded] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const user = useSelector((state) => state.auth?.user);
-
+  const navigate = useNavigate();
   const { handleLogout } = useAuth();
 
   useEffect(() => {
@@ -32,14 +32,14 @@ const Hero = () => {
   }, []);
 
   return (
-
     <main className="relative min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans overflow-x-hidden">
       {/* Navigation */}
       <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+          scrolled
             ? "bg-[#FAF8F5]/90 backdrop-blur-md shadow-sm py-4"
             : "bg-transparent py-6"
-          }`}
+        }`}
       >
         <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
           <div className="hidden md:flex space-x-8 text-[11px] uppercase tracking-widest font-semibold text-stone-600">
@@ -114,6 +114,9 @@ const Hero = () => {
                 strokeWidth={1.5}
                 stroke="currentColor"
                 className="w-5 h-5"
+                onClick={() => {
+                  navigate("/products");
+                }}
               >
                 <path
                   strokeLinecap="round"
@@ -189,7 +192,7 @@ const Hero = () => {
 
       {/* Main Hero Content */}
       <div className="relative w-full h-screen">
-        <ImageSlider 
+        <ImageSlider
           autoPlay={true}
           interval={4000}
           accentColor="#ffffff" // Since it's full dark mode, white/light accent looks better, or Outfy's gold

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import { useProduct } from "../hooks/useProduct";
@@ -122,13 +122,19 @@ function AllProducts() {
   const [scrolled, setScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  // Pre-select category from URL query param e.g. /products?category=Women
+  const [searchParams] = useSearchParams();
+  const initialCategory = searchParams.get("category") || "All";
+
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState(
+    CATEGORIES.includes(initialCategory) ? initialCategory : "All"
+  );
   const [sort, setSort] = useState("newest");
 
   useEffect(() => {

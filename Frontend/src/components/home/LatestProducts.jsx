@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router";
 
 const products = [
   {
@@ -96,6 +97,7 @@ const LatestProducts = () => {
   const goTo = (i) => setActiveIndex(i);
 
   const activeProduct = products[activeIndex];
+  const navigate = useNavigate();
 
   return (
     <motion.section
@@ -190,6 +192,9 @@ const LatestProducts = () => {
           </button>
 
           <button
+            onClick={() => {
+              navigate("/products");
+            }}
             className="w-10 h-10 rounded-full bg-[#1A1C19] text-white flex items-center
             justify-center shadow-md hover:bg-[#827668] transition-colors duration-200"
           >
