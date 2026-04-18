@@ -1,66 +1,246 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { Link } from "react-router";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 
 const products = [
   {
     id: 1,
-    name: "T-Shirt Short",
-    price: "$ 890.98 USD",
-    image: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=500&q=80",
+    name: "Leather Jacket",
+    price: "$ 890.00 USD",
+    image:
+      "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80",
   },
   {
     id: 2,
-    name: "Short-Sleeved Shirts",
-    price: "$ 912.98 USD",
-    image: "https://images.unsplash.com/photo-1596755094514-f87e32f85e2c?w=500&q=80",
+    name: "Lace Midi Skirt",
+    price: "$ 460.00 USD",
+    image:
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80",
   },
   {
     id: 3,
-    name: "Sleeved Shirts with Inner",
-    price: "$ 629.98 USD",
-    image: "https://images.unsplash.com/photo-1603252109303-2751441dd157?w=500&q=80",
+    name: "Minimalist Blazer",
+    price: "$ 720.00 USD",
+    image:
+      "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80",
+  },
+  {
+    id: 4,
+    name: "Snake Print Coat",
+    price: "$ 1,120.00 USD",
+    image:
+      "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&q=80",
+  },
+  {
+    id: 5,
+    name: "Black Mini Dress",
+    price: "$ 540.00 USD",
+    image:
+      "https://images.unsplash.com/photo-1475180098004-ca77a66827be?w=600&q=80",
+  },
+  {
+    id: 6,
+    name: "Fringe Skirt",
+    price: "$ 670.00 USD",
+    image:
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80",
+  },
+  {
+    id: 7,
+    name: "Denim Jacket",
+    price: "$ 480.00 USD",
+    image:
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80",
   },
 ];
 
+const N = products.length;
+const mod = (n, m) => ((n % m) + m) % m;
+
+// Config per distance from center
+const CARD_CONFIG = {
+  0: { w: 280, h: 460, opacity: 1, brightness: 1, zIndex: 20 },
+  1: { w: 180, h: 390, opacity: 0.92, brightness: 0.88, zIndex: 15 },
+  2: { w: 130, h: 325, opacity: 0.75, brightness: 0.72, zIndex: 10 },
+  3: { w: 90, h: 270, opacity: 0.5, brightness: 0.58, zIndex: 5 },
+};
+
+// SLOT_X: pre-calculated center x per dist (widths + 12px gap)
+// dist ±1: 280/2 + 12 + 180/2 = 242
+// dist ±2: 242 + 180/2 + 12 + 130/2 = 409
+// dist ±3: 409 + 130/2 + 12 + 90/2 = 531
+//242 409 531
+const SLOT_X = {
+  0: 0,
+  1: 225,
+  "-1": -225,
+  2: 374,
+  "-2": -374,
+  3: 480,
+  "-3": -480,
+};
+
+// Compute signed shortest-path distance from activeIndex
+const getDist = (index, activeIndex) => {
+  let d = index - activeIndex;
+  if (d > Math.floor(N / 2)) d -= N;
+  if (d < -Math.floor(N / 2)) d += N;
+  return d;
+};
+
 const LatestProducts = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const prev = () => setActiveIndex((i) => mod(i - 1, N));
+  const next = () => setActiveIndex((i) => mod(i + 1, N));
+  const goTo = (i) => setActiveIndex(i);
+
+  const activeProduct = products[activeIndex];
+
   return (
-    <section className="py-24 px-6 md:px-22 bg-[#FAF8F5]">
+    <motion.section
+      className="py-24 bg-white overflow-hidden"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.9 }}
+    >
+      {/* ── Title ── */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, delay: 0.1 }}
       >
-        <h2 className="text-2xl font-serif text-[#1A1C19] mb-12">Latest Products</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {products.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: index * 0.2 }}
-              className="group cursor-pointer"
-            >
-              <div className="relative aspect-[4/5] mb-4 overflow-hidden rounded-2xl bg-stone-200">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-              <h3 className="text-sm font-semibold text-[#1A1C19] mb-1">{product.name}</h3>
-              <p className="text-xs text-stone-500 mb-3">{product.price}</p>
-              <button className="text-[11px] uppercase tracking-widest text-[#827668] hover:text-[#1A1C19] transition-colors relative inline-block group/btn">
-                Add to Cart <span className="ml-1 transition-transform group-hover/btn:translate-x-1 inline-block">→</span>
-                <span className="absolute left-0 bottom-[-2px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover/btn:w-full"></span>
-              </button>
-            </motion.div>
-          ))}
+        <h2
+          className="text-3xl md:text-4xl font-bold tracking-[0.18em] text-[#1A1C19] uppercase"
+          style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
+        >
+          Featured Collection
+        </h2>
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <span className="h-px w-12 bg-[#1A1C19]/20" />
+          <span className="text-[10px] uppercase tracking-[0.5em] text-[#827668]">
+            New Arrivals
+          </span>
+          <span className="h-px w-12 bg-[#1A1C19]/20" />
         </div>
       </motion.div>
-    </section>
+
+      {/* ── Carousel Stage ── */}
+      <div
+        className="relative flex justify-center select-none"
+        style={{ height: 480 }}
+      >
+        {products.map((product, index) => {
+          const dist = getDist(index, activeIndex);
+          const absDist = Math.abs(dist);
+          const isVisible = absDist <= 3;
+          const config = CARD_CONFIG[Math.min(absDist, 3)];
+          // Pure pixel x: SLOT_X center position minus half card width — no percentage transforms
+          const slotCenter = SLOT_X[dist] ?? (dist > 0 ? 700 : -700);
+          const x = slotCenter - config.w / 2;
+          const isCenter = dist === 0;
+
+          return (
+            <motion.div
+              key={product.id}
+              animate={{
+                x,
+                width: config.w,
+                height: config.h,
+                opacity: isVisible ? config.opacity : 0,
+                filter: `brightness(${config.brightness})`,
+                zIndex: isVisible ? config.zIndex : 0,
+              }}
+              transition={{
+                duration: 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94], // smooth ease-out-quart
+              }}
+              onClick={() => {
+                if (!isCenter) goTo(index);
+              }}
+              className={`absolute bottom-0 rounded-xl overflow-hidden
+                ${isCenter ? "shadow-2xl cursor-default" : "shadow-md cursor-pointer hover:opacity-90"}
+              `}
+              style={{ left: "50%" }}
+            >
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover object-center"
+                draggable={false}
+              />
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* ── Controls: Arrows + Cart ── */}
+      <div className="flex flex-col items-center mt-10 gap-5">
+        <div className="flex items-center gap-15">
+          <button
+            onClick={prev}
+            className="w-10 h-10 rounded-full border border-stone-300 bg-white text-[#1A1C19]
+              flex items-center justify-center hover:bg-[#1A1C19] hover:text-white
+              hover:border-[#1A1C19] transition-all duration-200 shadow-sm"
+          >
+            <ChevronLeft size={17} />
+          </button>
+
+          <button
+            className="w-10 h-10 rounded-full bg-[#1A1C19] text-white flex items-center
+            justify-center shadow-md hover:bg-[#827668] transition-colors duration-200"
+          >
+            <ShoppingCart size={15} />
+          </button>
+
+          <button
+            onClick={next}
+            className="w-10 h-10 rounded-full border border-stone-300 bg-white text-[#1A1C19]
+              flex items-center justify-center hover:bg-[#1A1C19] hover:text-white
+              hover:border-[#1A1C19] transition-all duration-200 shadow-sm"
+          >
+            <ChevronRight size={17} />
+          </button>
+        </div>
+
+        {/* Active Product Info */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeProduct.id}
+            className="text-center"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+          >
+            <p className="text-sm font-semibold tracking-[0.2em] uppercase text-[#1A1C19]">
+              {activeProduct.name}
+            </p>
+            <p className="text-xs text-[#827668] mt-1 tracking-widest">
+              {activeProduct.price}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* ── Dot Indicators ── */}
+      <div className="flex items-center justify-center gap-2 mt-8">
+        {products.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`rounded-full transition-all duration-500 ${
+              i === activeIndex
+                ? "w-7 h-1.5 bg-[#1A1C19]"
+                : "w-1.5 h-1.5 bg-stone-300 hover:bg-stone-400"
+            }`}
+          />
+        ))}
+      </div>
+    </motion.section>
   );
 };
 
