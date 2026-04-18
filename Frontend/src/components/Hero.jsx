@@ -4,6 +4,14 @@ import { useSelector } from "react-redux";
 import { useAuth } from "../feature/auth/hooks/useAuth";
 import { CloudCog } from "lucide-react";
 
+import LatestProducts from "./home/LatestProducts";
+import FeaturesRow from "./home/FeaturesRow";
+import CategoriesGrid from "./home/CategoriesGrid";
+import ExclusiveOffers from "./home/ExclusiveOffers";
+import FeaturedProducts from "./home/FeaturedProducts";
+import SeasonalCollection from "./home/SeasonalCollection";
+import Testimonials from "./home/Testimonials";
+import Footer from "./home/Footer";
 const Hero = () => {
   const [scrolled, setScrolled] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -241,6 +249,15 @@ const Hero = () => {
           </div>
         </div>
       </div>
+
+      <LatestProducts />
+      <FeaturesRow />
+      <CategoriesGrid />
+      <ExclusiveOffers />
+      <FeaturedProducts />
+      <SeasonalCollection />
+      <Testimonials />
+      <Footer />
     </main>
   );
 };
