@@ -44,28 +44,28 @@ const Hero = () => {
         <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
           <div className="hidden md:flex space-x-8 text-[11px] uppercase tracking-widest font-semibold text-stone-600">
             <Link
-              to="#"
+              to="/products"
               className="hover:text-[#1A1C19] transition-colors relative group"
             >
               Shop
               <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full"></span>
             </Link>
             <Link
-              to="#"
+              to="/products?category=Men"
               className="hover:text-[#1A1C19] transition-colors relative group"
             >
               Men
               <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full"></span>
             </Link>
             <Link
-              to="#"
+              to="/products?category=Women"
               className="hover:text-[#1A1C19] transition-colors relative group"
             >
               Women
               <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full"></span>
             </Link>
             <Link
-              to="#"
+              to="/products?category=Kids"
               className="hover:text-[#1A1C19] transition-colors relative group"
             >
               Kids

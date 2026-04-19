@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { useProduct } from "../hooks/useProduct";
 import { motion } from "framer-motion";
@@ -7,6 +7,8 @@ import { Edit2, Trash2, Power, EyeOff, Eye } from "lucide-react";
 
 function GetProduct() {
   const { handleGetProducts, handleDeleteProduct, handleToggleProductStatus } = useProduct();
+  const user = useSelector((state) => state.auth?.user);
+  const isSeller = user?.isSeller || user?.role === "seller";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -92,20 +94,24 @@ function GetProduct() {
             </div>
           )}
 
-          {/* Action Menu (Hover) */}
+          {/* Action Menu (Hover) — Preview visible to all, seller actions gated */}
           <div className="absolute top-4 right-4 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <Link to={`/product/${id}`} className="bg-white/90 backdrop-blur text-[#1A1C19] p-2 rounded-full shadow hover:bg-white transition flex items-center justify-center" title="Preview">
               <Eye className="w-3 h-3" />
             </Link>
-            <button onClick={() => toggleStatus(id)} className="bg-white/90 backdrop-blur text-[#1A1C19] p-2 rounded-full shadow hover:bg-white transition" title={product.isActive ? "Deactivate" : "Activate"}>
-              <Power className="w-3 h-3" />
-            </button>
-            <Link to={`/seller/edit/${id}`} className="bg-white/90 backdrop-blur text-[#1A1C19] p-2 rounded-full shadow hover:bg-white transition flex items-center justify-center" title="Edit">
-              <Edit2 className="w-3 h-3" />
-            </Link>
-            <button onClick={() => deleteProduct(id)} className="bg-white/90 backdrop-blur text-red-600 p-2 rounded-full shadow hover:bg-white transition" title="Delete">
-              <Trash2 className="w-3 h-3" />
-            </button>
+            {isSeller && (
+              <>
+                <button onClick={() => toggleStatus(id)} className="bg-white/90 backdrop-blur text-[#1A1C19] p-2 rounded-full shadow hover:bg-white transition" title={product.isActive ? "Deactivate" : "Activate"}>
+                  <Power className="w-3 h-3" />
+                </button>
+                <Link to={`/seller/edit/${id}`} className="bg-white/90 backdrop-blur text-[#1A1C19] p-2 rounded-full shadow hover:bg-white transition flex items-center justify-center" title="Edit">
+                  <Edit2 className="w-3 h-3" />
+                </Link>
+                <button onClick={() => deleteProduct(id)} className="bg-white/90 backdrop-blur text-red-600 p-2 rounded-full shadow hover:bg-white transition" title="Delete">
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </>
+            )}
           </div>
 
           {/* Image Container */}

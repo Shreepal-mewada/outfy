@@ -1,33 +1,62 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import { useProduct } from "../hooks/useProduct";
-import { ArrowLeft, Edit2, ShieldCheck, Truck, RefreshCcw } from "lucide-react";
+import { ArrowLeft, Edit2, ShieldCheck, Truck, RefreshCcw, Tag, Layers, Wind, Scissors, Users, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
+
+// ── tiny helper ──────────────────────────────────────────────────
+function SpecRow({ label, value }) {
+  if (!value) return null;
+  return (
+    <div className="flex justify-between items-center py-2.5 border-b border-[#EAE8E3] last:border-0">
+      <span className="text-[10px] uppercase tracking-widest font-bold text-stone-400">{label}</span>
+      <span className="text-xs font-medium text-[#1A1C19] text-right max-w-[55%]">{value}</span>
+    </div>
+  );
+}
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const { handleGetProductById, isLoading, error } = useProduct();
+  const navigate = useNavigate();
+  const { handleGetProductById, handleGetAllProducts, isLoading, error } = useProduct();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [moreProducts, setMoreProducts] = useState([]);
+  const user = useSelector((state) => state.auth?.user);
+  const isSeller = user?.isSeller || user?.role === "seller";
 
+  // fetch current product
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetch = async () => {
       try {
         const data = await handleGetProductById(id);
-        if (data && data.product) {
-          setProduct(data.product);
-        }
+        if (data?.product) setProduct(data.product);
       } catch (err) {
         console.error(err);
       }
     };
-    fetchProduct();
-  }, [id, handleGetProductById]);
+    fetch();
+    setActiveImage(0);
+  }, [id]);
+
+  // fetch all products for "More" strip
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const res = await handleGetAllProducts();
+        if (res?.products) {
+          setMoreProducts(res.products.filter((p) => (p._id || p.id) !== id));
+        }
+      } catch (_) {}
+    };
+    fetchAll();
+  }, [id]);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#1A1C19] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-6 h-6 border-2 border-[#1A1C19] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -36,45 +65,56 @@ export default function ProductDetails() {
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex flex-col items-center justify-center p-6">
         <p className="text-red-500 mb-4">{error || "Product not found."}</p>
-        <Link to="/seller" className="text-[#827668] underline text-sm">Return to Dashboard</Link>
+        <Link to={isSeller ? "/seller" : "/"} className="text-[#827668] underline text-sm">
+          {isSeller ? "Return to Dashboard" : "Back to Shop"}
+        </Link>
       </div>
     );
   }
 
-  const images = product.images?.length > 0
-    ? product.images.map(i => i.url || i)
-    : ["/outfy-fashion-model.png"];
+  const images =
+    product.images?.length > 0
+      ? product.images.map((i) => i.url || i)
+      : ["/outfy-fashion-model.png"];
 
   const hasDiscount = product.discountPercentage > 0;
   const currency = product.currency || "INR";
+  const totalStock = product.sizes?.reduce((s, x) => s + (x.stock || 0), 0) ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans">
-      
-      {/* Top Navbar */}
-      <nav className="border-b border-[#EAE8E3] bg-white sticky top-0 z-10 px-6 py-4 flex items-center justify-between">
-        <Link to="/seller" className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-[#827668] hover:text-[#1A1C19] transition-colors font-bold">
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans" style={{ zoom: 0.9 }}>
+
+      {/* ── Navbar ────────────────────────────────────── */}
+      <nav className="border-b border-[#EAE8E3] bg-white sticky top-0 z-10 px-5 py-3 flex items-center justify-between">
+        <Link
+          to={isSeller ? "/seller" : "/"}
+          className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-[#827668] hover:text-[#1A1C19] transition-colors font-bold"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          {isSeller ? "Back to Dashboard" : "Back to Shop"}
         </Link>
         <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-stone-400">
-          Seller Preview Mode
+          {isSeller ? "Seller Preview Mode" : "Product Details"}
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-6 py-12 lg:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
-          
-          {/* Left Column: Image Gallery */}
-          <div className="space-y-6">
-            <motion.div 
-               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-               className="aspect-[4/5] sm:aspect-square md:aspect-[4/5] bg-[#EAE8E3] rounded-2xl md:rounded-[2rem] overflow-hidden relative shadow-sm"
+      <main className="max-w-5xl mx-auto px-5 py-8 lg:py-12">
+
+        {/* ── Hero Grid ─────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
+
+          {/* Left: Image Gallery */}
+          <div className="space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="aspect-[4/5] bg-[#EAE8E3] rounded-2xl overflow-hidden relative shadow-sm"
             >
               <AnimatePresence mode="wait">
                 <motion.img
                   key={activeImage}
                   src={images[activeImage]}
-                  initial={{ opacity: 0, scale: 1.05 }}
+                  initial={{ opacity: 0, scale: 1.04 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
@@ -83,180 +123,217 @@ export default function ProductDetails() {
                 />
               </AnimatePresence>
             </motion.div>
-            
-            {/* Thumbnails */}
+
             {images.length > 1 && (
-              <div className="grid grid-cols-5 gap-4">
+              <div className="grid grid-cols-5 gap-2.5">
                 {images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveImage(idx)}
-                    className={`aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200 ${
-                      activeImage === idx ? "border-[#1A1C19] opacity-100" : "border-transparent opacity-60 hover:opacity-100"
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      activeImage === idx
+                        ? "border-[#1A1C19] opacity-100"
+                        : "border-transparent opacity-50 hover:opacity-90"
                     }`}
                   >
-                    <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
+                    <img src={img} alt="thumb" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Right Column: Details */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-            className="flex flex-col pt-4 lg:pt-10"
+          {/* Right: All Details */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15 }}
+            className="flex flex-col gap-0"
           >
-            {/* Brand / Category */}
-            <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#827668] mb-4 flex items-center gap-2">
+            {/* Brand / Category breadcrumb */}
+            <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#827668] mb-3 flex items-center gap-2">
               <span>{product.brandName || "Outfy Originals"}</span>
-              <span className="w-1 h-1 rounded-full bg-stone-300"></span>
+              <span className="w-1 h-1 rounded-full bg-stone-300" />
               <span>{product.category || "General"}</span>
+              {product.gender && (
+                <>
+                  <span className="w-1 h-1 rounded-full bg-stone-300" />
+                  <span>{product.gender}</span>
+                </>
+              )}
             </div>
 
             {/* Title */}
-            <h1 className="font-serif text-4xl lg:text-5xl tracking-tighter leading-tight mb-6 text-[#1A1C19]">
+            <h1 className="font-serif text-3xl lg:text-[2.2rem] tracking-tighter leading-tight mb-3 text-[#1A1C19]">
               {product.title}
             </h1>
 
             {/* Description */}
-            <p className="text-stone-500 mb-8 leading-relaxed font-light text-sm">
+            <p className="text-stone-500 mb-5 leading-relaxed font-light text-[13px]">
               {product.description}
             </p>
 
-            {/* Pricing Matrix */}
-            <div className="mb-10 space-y-2">
-              <div className="flex items-center gap-4">
-                <span className="text-3xl font-bold tracking-tight">
-                  {currency} {product.finalPrice || Math.round(product.originalPrice - (product.originalPrice * (product.discountPercentage / 100)))}
+            {/* Price */}
+            <div className="mb-5 space-y-1">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl font-bold tracking-tight">
+                  {currency}{" "}
+                  {product.finalPrice ||
+                    Math.round(
+                      product.originalPrice -
+                        product.originalPrice * (product.discountPercentage / 100)
+                    )}
                 </span>
                 {hasDiscount && (
-                  <span className="bg-[#1A1C19] text-white text-[10px] font-bold px-2 py-1 rounded">
+                  <span className="bg-[#1A1C19] text-white text-[10px] font-bold px-2 py-0.5 rounded">
                     {product.discountPercentage}% OFF
                   </span>
                 )}
               </div>
               {hasDiscount && (
-                <span className="text-stone-400 font-medium line-through">
+                <span className="text-stone-400 font-medium line-through text-sm">
                   {currency} {product.originalPrice}
                 </span>
               )}
             </div>
 
-            {/* Sizes Array Renderer */}
-            {product.sizes && product.sizes.length > 0 && (
-               <div className="mb-10">
-                 <h4 className="text-[10px] uppercase tracking-widest text-[#827668] font-bold mb-3">Available Sizes</h4>
-                 <div className="flex flex-wrap gap-3">
-                   {product.sizes.map((s, idx) => (
-                     <div key={idx} className={`border px-4 py-2 rounded-lg text-sm font-medium ${s.stock > 0 ? "border-[#1A1C19] text-[#1A1C19] bg-white" : "border-stone-200 text-stone-300 bg-stone-50"}`}>
-                       {s.size} <span className="ml-2 text-[10px] opacity-60">({s.stock} left)</span>
-                     </div>
-                   ))}
-                 </div>
-               </div>
+            {/* Sizes */}
+            {product.sizes?.length > 0 && (
+              <div className="mb-5">
+                <p className="text-[10px] uppercase tracking-widest text-[#827668] font-bold mb-2">
+                  Available Sizes
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((s, idx) => (
+                    <div
+                      key={idx}
+                      className={`border px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 ${
+                        s.stock > 0
+                          ? "border-[#1A1C19] text-[#1A1C19] bg-white"
+                          : "border-stone-200 text-stone-300 bg-stone-50"
+                      }`}
+                    >
+                      {s.size}
+                      <span className="text-[10px] opacity-50">({s.stock})</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
-            {/* Seller "Edit" Action (Replacing Add to Cart) */}
-            <div className="flex items-center gap-4 border-t border-[#EAE8E3] pt-8">
-              <Link 
-                to={`/seller/edit/${product._id}`}
-                className="flex-1 bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#827668] transition-colors shadow-xl shadow-stone-200"
-              >
-                <Edit2 className="w-4 h-4" /> Edit Listing
-              </Link>
+            {/* ── Inline Specs ───────────────────────────── */}
+            <div className="mb-5 bg-white rounded-2xl border border-stone-100 px-4 py-1 shadow-sm">
+              <SpecRow label="Total Stock" value={`${totalStock} units`} />
+              <SpecRow label="Fabric" value={product.fabric} />
+              <SpecRow label="Fit" value={product.fit} />
+              <SpecRow label="Pattern" value={product.pattern} />
+              <SpecRow label="Sleeve" value={product.sleeveType} />
+              <SpecRow label="Occasion" value={product.occasion?.length ? product.occasion.join(", ") : null} />
+              <SpecRow label="Tags" value={product.tags?.length ? product.tags.join(", ") : null} />
             </div>
-            
+
+            {/* ── Policies strip ─────────────────────────── */}
+            <div className="mb-5 grid grid-cols-3 gap-3">
+              {[
+                { Icon: ShieldCheck, label: "Care", value: product.careInstructions || "Standard wash" },
+                { Icon: RefreshCcw, label: "Returns", value: product.returnPolicy || "Standard policy" },
+                { Icon: Truck,       label: "Delivery", value: product.deliveryInfo || "3–5 business days" },
+              ].map(({ Icon, label, value }) => (
+                <div key={label} className="bg-white border border-stone-100 rounded-xl p-3 flex flex-col gap-1.5">
+                  <Icon className="w-3.5 h-3.5 text-[#827668]" />
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-[#1A1C19]">{label}</p>
+                  <p className="text-[10px] text-stone-400 font-light leading-snug">{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="border-t border-[#EAE8E3] pt-5">
+              {isSeller ? (
+                <Link
+                  to={`/seller/edit/${product._id}`}
+                  className="w-full bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#827668] transition-colors shadow-lg shadow-stone-200"
+                >
+                  <Edit2 className="w-3.5 h-3.5" /> Edit Listing
+                </Link>
+              ) : (
+                <button className="w-full bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#827668] transition-colors shadow-lg shadow-stone-200">
+                  Add to Cart
+                </button>
+              )}
+            </div>
           </motion.div>
         </div>
 
-        {/* Specifications Roll-up Section */}
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="mt-24 border-t border-[#EAE8E3] pt-16"
-        >
-          <div className="text-center mb-12">
-            <h2 className="font-serif text-3xl tracking-tighter italic text-[#1A1C19]">Specifications</h2>
-            <p className="text-[10px] uppercase tracking-widest text-[#827668] mt-2 font-bold">All Listed Attributes</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-            
-            {/* Characteristics */}
-            <div className="space-y-6">
-              <h4 className="text-[10px] uppercase tracking-widest text-[#827668] font-bold border-b border-[#EAE8E3] pb-2">Characteristics</h4>
-              <ul className="space-y-4 text-sm font-medium text-[#1A1C19]">
-                <li className="flex justify-between">
-                  <span className="text-stone-400">Gender</span>
-                  <span>{product.gender || "Unisex"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-stone-400">Fit</span>
-                  <span>{product.fit || "Standard"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-stone-400">Pattern</span>
-                  <span>{product.pattern || "Solid"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-stone-400">Sleeve</span>
-                  <span>{product.sleeveType || "Standard"}</span>
-                </li>
-              </ul>
+        {/* ── More Products ──────────────────────────────── */}
+        {moreProducts.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mt-16 border-t border-[#EAE8E3] pt-10"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="font-serif text-2xl tracking-tighter text-[#1A1C19]">More Products</h2>
+                <p className="text-[10px] uppercase tracking-widest text-[#827668] font-bold mt-0.5">
+                  Explore the full collection
+                </p>
+              </div>
             </div>
 
-            {/* Material & Occasion */}
-            <div className="space-y-6">
-              <h4 className="text-[10px] uppercase tracking-widest text-[#827668] font-bold border-b border-[#EAE8E3] pb-2">Material</h4>
-              <ul className="space-y-4 text-sm font-medium text-[#1A1C19]">
-                <li className="flex justify-between">
-                  <span className="text-stone-400">Fabric</span>
-                  <span>{product.fabric || "Not Specified"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-stone-400">Occasion</span>
-                  <span className="text-right">{product.occasion?.length ? product.occasion.join(", ") : "Casual"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span className="text-stone-400">Tags</span>
-                  <span className="text-right max-w-[120px] truncate">{product.tags?.length ? product.tags.join(", ") : "None"}</span>
-                </li>
-              </ul>
+            {/* Horizontal scroll strip */}
+            <div
+              className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory"
+              style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
+            >
+              {moreProducts.map((p) => {
+                const pid = p._id || p.id;
+                const thumb = p.images?.[0]?.url || p.images?.[0] || "/outfy-fashion-model.png";
+                const pDiscount = p.discountPercentage > 0;
+                const pCurrency = p.currency || "INR";
+                const pPrice = p.finalPrice || Math.round(p.originalPrice - p.originalPrice * (p.discountPercentage / 100));
+
+                return (
+                  <motion.button
+                    key={pid}
+                    onClick={() => navigate(`/product/${pid}`)}
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex-none w-44 snap-start group text-left"
+                  >
+                    {/* Image */}
+                    <div className="aspect-[3/4] rounded-xl overflow-hidden bg-[#EAE8E3] mb-3 relative">
+                      <img
+                        src={thumb}
+                        alt={p.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      {pDiscount && (
+                        <span className="absolute top-2 left-2 bg-[#1A1C19] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                          -{p.discountPercentage}%
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <p className="text-xs font-medium text-[#1A1C19] truncate leading-tight">{p.title}</p>
+                    <p className="text-[10px] text-stone-400 uppercase tracking-widest truncate mb-1">
+                      {p.category || "General"}
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-[#1A1C19]">{pCurrency} {pPrice}</span>
+                      {pDiscount && (
+                        <span className="text-[10px] text-stone-400 line-through">{p.originalPrice}</span>
+                      )}
+                    </div>
+                  </motion.button>
+                );
+              })}
             </div>
-
-            {/* Policies */}
-            <div className="md:col-span-2 space-y-6 bg-white p-6 rounded-2xl border border-stone-200">
-               <h4 className="text-[10px] uppercase tracking-widest text-[#827668] font-bold">Policies & Instructions</h4>
-               
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-                 <div className="flex gap-4 items-start">
-                   <ShieldCheck className="w-5 h-5 text-[#827668] shrink-0" />
-                   <div>
-                     <p className="text-[10px] uppercase tracking-widest font-bold text-[#1A1C19] mb-1">Care Instructions</p>
-                     <p className="text-sm font-light text-stone-500">{product.careInstructions || "Standard wash."}</p>
-                   </div>
-                 </div>
-                 
-                 <div className="flex gap-4 items-start">
-                   <RefreshCcw className="w-5 h-5 text-[#827668] shrink-0" />
-                   <div>
-                     <p className="text-[10px] uppercase tracking-widest font-bold text-[#1A1C19] mb-1">Return Policy</p>
-                     <p className="text-sm font-light text-stone-500">{product.returnPolicy || "Standard returns apply."}</p>
-                   </div>
-                 </div>
-
-                 <div className="flex gap-4 items-start sm:col-span-2">
-                   <Truck className="w-5 h-5 text-[#827668] shrink-0" />
-                   <div>
-                     <p className="text-[10px] uppercase tracking-widest font-bold text-[#1A1C19] mb-1">Delivery Information</p>
-                     <p className="text-sm font-light text-stone-500">{product.deliveryInfo || "Ships worldwide in 3-5 business days."}</p>
-                   </div>
-                 </div>
-               </div>
-            </div>
-
-          </div>
-        </motion.div>
+          </motion.section>
+        )}
 
       </main>
     </div>
