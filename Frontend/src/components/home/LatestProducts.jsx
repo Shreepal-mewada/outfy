@@ -116,8 +116,8 @@ const LatestProducts = () => {
         transition={{ duration: 0.8, delay: 0.1 }}
       >
         <h2
-          className="text-3xl md:text-4xl font-bold tracking-[0.18em] text-[#1A1C19] uppercase"
-          style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
+          className="text-3xl md:text-4xl font-semibold tracking-[0.18em] text-[#1A1C19] uppercase font-BlinkMacSystemFont  "
+          // style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
         >
           Featured Collection
         </h2>

@@ -7,25 +7,29 @@ const categories = [
   {
     title: "Kids",
     subtitle: "For everyone",
-    image: "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=800&q=80",
     link: "/products?category=Kids",
   },
   {
     title: "Men",
     subtitle: "Sharp & refined",
-    image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&q=80",
     link: "/products?category=Men",
   },
   {
     title: "Women",
     subtitle: "Effortlessly chic",
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80",
     link: "/products?category=Women",
   },
   {
     title: "Unisex",
     subtitle: "Playful & bright",
-    image: "https://images.unsplash.com/photo-1519238396346-630e665977a4?w=800&q=80",
+    image:
+      "https://images.unsplash.com/photo-1519238396346-630e665977a4?w=800&q=80",
     link: "/products?category=Unisex",
   },
 ];
@@ -63,8 +67,8 @@ const CategoriesGrid = () => {
               Browse by
             </p>
             <h2
-              className="text-3xl md:text-4xl font-bold uppercase tracking-[0.1em] text-[#1A1C19]"
-              style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
+              className="text-3xl md:text-4xl font-semibold uppercase tracking-[0.1em] text-[#1A1C19] font-BlinkMacSystemFont"
+              // style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
             >
               Shop by Category
             </h2>

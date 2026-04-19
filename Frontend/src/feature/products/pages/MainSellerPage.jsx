@@ -56,7 +56,7 @@ function MainSellerPage() {
           {/* Brand */}
           <Link
             to="/seller"
-            className="flex items-center gap-2 text-2xl md:text-3xl font-serif tracking-tighter text-[#1A1C19]"
+            className="flex items-center gap-2 text-2xl md:text-3xl tracking-tighter text-[#1A1C19] font-BlinkMacSystemFont"
           >
             OUTFY
             <span className="text-stone-400 font-sans tracking-widest text-[10px] uppercase ml-1 mt-2">
@@ -202,7 +202,7 @@ function MainSellerPage() {
             whileInView="show"
             viewport={{ once: true }}
             variants={fadeUp}
-            className="text-center font-serif text-4xl tracking-tighter mb-16 text-[#1A1C19]"
+            className="text-center font-BlinkMacSystemFont text-4xl tracking-tighter mb-16 text-[#1A1C19]"
           >
             Platform Reach Across Categories
           </motion.h2>
@@ -325,7 +325,7 @@ function MainSellerPage() {
             whileInView="show"
             viewport={{ once: true }}
             variants={fadeUp}
-            className="text-center font-serif text-4xl tracking-tighter mb-16 text-[#1A1C19]"
+            className="text-center font-BlinkMacSystemFont text-4xl tracking-tighter mb-16 text-[#1A1C19]"
           >
             See what our sellers have to say
           </motion.h2>
@@ -394,7 +394,7 @@ function MainSellerPage() {
               viewport={{ once: true }}
               variants={fadeUp}
             >
-              <h2 className="font-serif text-4xl tracking-tighter text-[#1A1C19] mb-2">
+              <h2 className="font-BlinkMacSystemFont text-4xl tracking-tighter text-[#1A1C19] mb-2">
                 Your Catalog
               </h2>
               <p className="text-[11px] uppercase tracking-widest text-stone-500">
@@ -418,7 +418,7 @@ function MainSellerPage() {
             variants={fadeUp}
             className="bg-[#FAF8F5] rounded-[2rem] p-10 flex flex-col justify-center"
           >
-            <h3 className="font-serif text-4xl tracking-tight text-[#1A1C19] mb-4">
+            <h3 className="font-BlinkMacSystemFont text-4xl tracking-tight text-[#1A1C19] mb-4">
               Outfy.in
               <br />
               Newsletter!
@@ -454,7 +454,7 @@ function MainSellerPage() {
               alt="CTA"
             />
             <div className="relative z-10">
-              <h3 className="font-serif text-4xl tracking-tight text-white mb-3">
+              <h3 className="font-BlinkMacSystemFont text-4xl tracking-tight text-white mb-3">
                 Start selling
                 <br />
                 today!

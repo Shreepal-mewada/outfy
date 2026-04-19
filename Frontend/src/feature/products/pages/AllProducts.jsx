@@ -318,8 +318,8 @@ function AllProducts() {
             </p>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <h1
-                className="text-4xl md:text-5xl font-bold uppercase tracking-[0.1em] text-[#1A1C19]"
-                style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
+                className="text-4xl md:text-5xl font-semibold uppercase tracking-[0.1em] text-[#1A1C19] font-BlinkMacSystemFont"
+                // style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
               >
                 All Products
               </h1>
