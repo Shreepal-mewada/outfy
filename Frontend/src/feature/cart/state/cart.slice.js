@@ -36,9 +36,14 @@ const cartSlice = createSlice({
         setError: (state, action) => {
             state.error = action.payload;
             state.loading = false;
+        },
+        clearCart: (state) => {
+            state.items = [];
+            state.loading = false;
+            state.error = null;
         }
     }
 })
 
-export const { setCart, addItem, updateItem, removeItem, setLoading, setError } = cartSlice.actions
+export const { setCart, addItem, updateItem, removeItem, setLoading, setError, clearCart } = cartSlice.actions
 export default cartSlice.reducer

@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Users,
   Truck,
+  Store
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -74,13 +75,14 @@ function MainSellerPage() {
               Sell Product
             </Link>
 
-            {/* <Link
+            <Link
               to="/"
-              className="group flex items-center gap-2 text-stone-500 hover:text-[#1A1C19] transition-colors duration-300"
-              title="Logout / Exit Default"
+              className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500 uppercase tracking-[0.1em] hover:text-[#1A1C19] transition-colors duration-300"
+              title="Go to Buyer Store"
             >
-              <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
-            </Link> */}
+              <Store className="w-4 h-4" />
+              View Store
+            </Link>
 
             {user ? (
               <div className="relative">

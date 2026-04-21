@@ -30,6 +30,7 @@ export default function ProductDetails() {
   const [addedFeedback, setAddedFeedback] = useState(false);
   const user = useSelector((state) => state.auth?.user);
   const isSeller = user?.isSeller || user?.role === "seller";
+  const isProductOwner = isSeller && product && (product.seller === user.id || product.seller?._id === user.id);
 
   // fetch current product
   useEffect(() => {
@@ -274,7 +275,7 @@ export default function ProductDetails() {
 
             {/* CTA */}
             <div className="border-t border-[#EAE8E3] pt-5 flex flex-col gap-3">
-              {isSeller ? (
+              {isProductOwner ? (
                 <Link
                   to={`/seller/edit/${product._id}`}
                   className="w-full bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#827668] transition-colors shadow-lg shadow-stone-200"

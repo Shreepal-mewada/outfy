@@ -1,5 +1,6 @@
 import { register, login, googleLogin, logout } from "../service/auth.api";
 import { setLoading, setUser } from "../state/auth.slice";
+import { clearCart } from "../../cart/state/cart.slice";
 import { useDispatch } from "react-redux";
 
 export function useAuth() {
@@ -64,6 +65,7 @@ export function useAuth() {
     try {
       const response = await logout();
       dispatch(setUser(null));
+      dispatch(clearCart());
       return { success: true };
     } catch (error) {
       console.error("Logout failed:", error);
