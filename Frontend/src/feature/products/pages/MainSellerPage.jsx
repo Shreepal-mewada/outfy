@@ -66,13 +66,13 @@ function MainSellerPage() {
           </Link>
 
           {/* Nav Actions */}
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3 md:space-x-6">
             <Link
               to="/seller/create"
-              className="flex items-center gap-2 bg-[#827668] text-white text-[10px] uppercase tracking-[0.15em] py-2.5 px-5 rounded-full hover:bg-[#6c6155] transition-all duration-300 transform hover:-translate-y-0.5 shadow-sm hover:shadow"
+              className="flex items-center gap-1.5 md:gap-2 bg-[#827668] text-white text-[10px] uppercase tracking-[0.15em] py-2 md:py-2.5 px-3 md:px-5 rounded-full hover:bg-[#6c6155] transition-all duration-300 transform hover:-translate-y-0.5 shadow-sm hover:shadow"
             >
               <Plus className="w-4 h-4" />
-              Sell Product
+              <span className="hidden sm:inline">Sell Product</span>
             </Link>
 
             <Link
@@ -81,7 +81,7 @@ function MainSellerPage() {
               title="Go to Buyer Store"
             >
               <Store className="w-4 h-4" />
-              View Store
+              <span className="hidden sm:inline">View Store</span>
             </Link>
 
             {user ? (

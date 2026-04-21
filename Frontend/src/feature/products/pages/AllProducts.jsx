@@ -41,11 +41,10 @@ function InlineNav({
 }) {
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-        scrolled
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled
           ? "bg-[#FAF9F7]/90 backdrop-blur-md shadow-sm py-4"
           : "bg-[#FAF9F7] py-6"
-      }`}
+        }`}
     >
       <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
         {/* Left links */}
@@ -349,7 +348,7 @@ function AllProducts() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <h1
                 className="text-4xl md:text-5xl font-semibold uppercase tracking-[0.1em] text-[#1A1C19] font-BlinkMacSystemFont"
-                // style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
+              // style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
               >
                 All Products
               </h1>
@@ -385,11 +384,10 @@ function AllProducts() {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest transition-all duration-300 ${
-                    activeCategory === cat
+                  className={`px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest transition-all duration-300 ${activeCategory === cat
                       ? "bg-[#1A1C19] text-white"
                       : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
-                  }`}
+                    }`}
                 >
                   {cat}
                 </button>
