@@ -28,8 +28,7 @@ const categories = [
   {
     title: "Unisex",
     subtitle: "Playful & bright",
-    image:
-      "https://images.unsplash.com/photo-1519238396346-630e665977a4?w=800&q=80",
+    image: "/outfy_unisex.png",
     link: "/products?category=Unisex",
   },
 ];

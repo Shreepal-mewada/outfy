@@ -53,3 +53,12 @@ export async function logout() {
     throw error.response.data;
   }
 }
+
+export async function getMe() {
+  try {
+    const response = await bseURL.get("/me");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+}

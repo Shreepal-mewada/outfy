@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 
 const sizeSchema = new mongoose.Schema(
   {
@@ -88,3 +88,4 @@ productSchema.pre("save", function () {
 const ProductModel = mongoose.model("Product", productSchema);
 
 export default ProductModel;
+

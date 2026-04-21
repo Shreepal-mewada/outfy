@@ -1,9 +1,8 @@
-﻿
-import jwt from "jsonwebtoken";
+﻿import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 import userModel from "../models/user.model.js";
 
-export const authProduct = async (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -20,19 +19,10 @@ export const authProduct = async (req, res, next) => {
       return res.status(401).json({ message: "User not found" });
     }
 
-    if (user.role !== "seller") {
-      return res
-        .status(403)
-        .json({ message: "buyer cannot access this route" });
-    }
-
     req.user = user;
-
-    // Authentication logic for product routes
     next();
-  } catch (err) {
-    console.error("Auth Middleware Error:", err);
-    return res.status(401).json({ message: "Invalid token" });
+  } catch (error) {
+    res.status(401).json({ message: "Invalid token" });
   }
 };
 

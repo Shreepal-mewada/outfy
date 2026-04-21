@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
 import { useAuth } from "../feature/auth/hooks/useAuth";
-import { CloudCog } from "lucide-react";
 import { useNavigate } from "react-router";
 import LatestProducts from "./home/LatestProducts";
 import FeaturesRow from "./home/FeaturesRow";
@@ -19,6 +18,8 @@ const Hero = () => {
   const [loaded, setLoaded] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const user = useSelector((state) => state.auth?.user);
+  const cartItems = useSelector((state) => state.cart?.items || []);
+  const totalCartItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const navigate = useNavigate();
   const { handleLogout } = useAuth();
 
@@ -106,7 +107,7 @@ const Hero = () => {
                 />
               </svg>
             </button>
-            <button className="hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
+            <Link to="/cart" className="relative hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -114,9 +115,6 @@ const Hero = () => {
                 strokeWidth={1.5}
                 stroke="currentColor"
                 className="w-5 h-5"
-                onClick={() => {
-                  navigate("/products");
-                }}
               >
                 <path
                   strokeLinecap="round"
@@ -124,7 +122,12 @@ const Hero = () => {
                   d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                 />
               </svg>
-            </button>
+              {totalCartItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-[#1A1C19] text-white text-[9px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1 leading-none">
+                  {totalCartItems > 99 ? "99+" : totalCartItems}
+                </span>
+              )}
+            </Link>
 
             {user ? (
               <div className="relative">

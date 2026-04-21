@@ -1,0 +1,11 @@
+﻿import { createBrowserRouter, Navigate } from "react-router";
+import { useSelector } from "react-redux";
+import Register from "../feature/auth/pages/Register";
+import Login from "../feature/auth/pages/Login";
+import Hero from "../components/Hero";
+import MainSellerPage from "../feature/products/pages/MainSellerPage";
+import CreateProduct from "../feature/products/pages/CreateProduct";
+import EditProduct from "../feature/products/pages/EditProduct";
+import ProductDetails from "../feature/products/pages/ProductDetails";
+import AllProducts from "../feature/products/pages/AllProducts";
+import Cart from "../feature/cart/pages/Cart";

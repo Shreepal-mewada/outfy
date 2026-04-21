@@ -153,3 +153,35 @@ export async function logoutUser(req, res) {
   });
   res.status(200).json({ message: "Logout successful" });
 }
+
+export async function getMe(req, res) {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    const decoded = jwt.verify(token, config.JWT_SECRET);
+    const userId = decoded.id || decoded.userId;
+    const user = await userModel.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      user: {
+        id: user._id,
+        email: user.email,
+        fullname: user.fullname,
+        contact: user.contact,
+        role: user.role,
+        isSeller: user.role === "seller",
+      },
+    });
+  } catch (error) {
+    res.status(401).json({ message: "Invalid or expired token" });
+  }
+}
+
+

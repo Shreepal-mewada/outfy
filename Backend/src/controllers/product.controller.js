@@ -1,4 +1,4 @@
-import ProductModel from "../models/product.model.js";
+﻿import ProductModel from "../models/product.model.js";
 import { uploadFile } from "../services/storage.service.js";
 
 // Helper to parse JSON fields safely
@@ -283,3 +283,4 @@ export async function getAllProducts(req, res) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 }
+

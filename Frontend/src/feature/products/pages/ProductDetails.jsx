@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import { useProduct } from "../hooks/useProduct";
-import { ArrowLeft, Edit2, ShieldCheck, Truck, RefreshCcw, Tag, Layers, Wind, Scissors, Users, Star } from "lucide-react";
+import { useCart } from "../../cart/hooks/useCart";
+import { ArrowLeft, Edit2, ShieldCheck, Truck, RefreshCcw, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector } from "react-redux";
 
@@ -20,9 +21,13 @@ export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { handleGetProductById, handleGetAllProducts, isLoading, error } = useProduct();
+  const { handleAddToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [moreProducts, setMoreProducts] = useState([]);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [addedFeedback, setAddedFeedback] = useState(false);
   const user = useSelector((state) => state.auth?.user);
   const isSeller = user?.isSeller || user?.role === "seller";
 
@@ -31,7 +36,10 @@ export default function ProductDetails() {
     const fetch = async () => {
       try {
         const data = await handleGetProductById(id);
-        if (data?.product) setProduct(data.product);
+        if (data?.product) {
+          setProduct(data.product);
+          setSelectedSize(null); // reset size on product change
+        }
       } catch (err) {
         console.error(err);
       }
@@ -39,6 +47,23 @@ export default function ProductDetails() {
     fetch();
     setActiveImage(0);
   }, [id]);
+
+  const handleAddToCartClick = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    setAddingToCart(true);
+    try {
+      await handleAddToCart(product._id, 1);
+      setAddedFeedback(true);
+      setTimeout(() => setAddedFeedback(false), 2000);
+    } catch (err) {
+      console.error("Add to cart failed:", err);
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   // fetch all products for "More" strip
   useEffect(() => {
@@ -248,7 +273,7 @@ export default function ProductDetails() {
             </div>
 
             {/* CTA */}
-            <div className="border-t border-[#EAE8E3] pt-5">
+            <div className="border-t border-[#EAE8E3] pt-5 flex flex-col gap-3">
               {isSeller ? (
                 <Link
                   to={`/seller/edit/${product._id}`}
@@ -256,10 +281,36 @@ export default function ProductDetails() {
                 >
                   <Edit2 className="w-3.5 h-3.5" /> Edit Listing
                 </Link>
-              ) : (
-                <button className="w-full bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#827668] transition-colors shadow-lg shadow-stone-200">
-                  Add to Cart
+              ) : totalStock === 0 ? (
+                <button
+                  disabled
+                  className="w-full bg-stone-100 text-stone-400 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed"
+                >
+                  Out of Stock
                 </button>
+              ) : (
+                <button
+                  onClick={handleAddToCartClick}
+                  disabled={addingToCart}
+                  className="w-full bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#2d3028] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-stone-200 disabled:opacity-60 cursor-pointer"
+                >
+                  {addingToCart ? (
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : addedFeedback ? (
+                    <>
+                      <span>✓</span> Added to Cart
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+                    </>
+                  )}
+                </button>
+              )}
+              {!user && (
+                <p className="text-center text-[9px] uppercase tracking-wider text-stone-400">
+                  <Link to="/login" className="underline hover:text-[#1A1C19] transition-colors">Sign in</Link> to add items to your cart
+                </p>
               )}
             </div>
           </motion.div>

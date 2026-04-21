@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useSearchParams, useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import { useProduct } from "../hooks/useProduct";
 import { useAuth } from "../../auth/hooks/useAuth";
-import { ShoppingBag, Search } from "lucide-react";
+import { useCart } from "../../cart/hooks/useCart";
+import { ShoppingBag, Search, ShoppingCart } from "lucide-react";
 
 const CATEGORIES = ["All", "Men", "Women", "Kids", "Unisex"];
 const SORT_OPTIONS = [
@@ -36,6 +37,7 @@ function InlineNav({
   setIsProfileOpen,
   handleLogout,
   setActiveCategory,
+  navCartTotal = 0,
 }) {
   return (
     <nav
@@ -83,8 +85,8 @@ function InlineNav({
 
         {/* Right actions */}
         <div className="flex items-center space-x-5 text-stone-700">
-          {/* Cart icon */}
-          <button className="hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
+          {/* Cart icon with badge */}
+          <Link to="/cart" className="relative hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -99,7 +101,12 @@ function InlineNav({
                 d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
               />
             </svg>
-          </button>
+            {navCartTotal > 0 && (
+              <span className="absolute -top-2 -right-2 bg-[#1A1C19] text-white text-[9px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1 leading-none">
+                {navCartTotal > 99 ? "99+" : navCartTotal}
+              </span>
+            )}
+          </Link>
 
           {user ? (
             <div className="relative">
@@ -176,7 +183,12 @@ function InlineNav({
 function AllProducts() {
   const { handleGetAllProducts } = useProduct();
   const user = useSelector((state) => state.auth?.user);
+  const cartItems = useSelector((state) => state.cart?.items || []);
+  const navCartTotal = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const { handleLogout } = useAuth();
+  const { handleAddToCart } = useCart();
+  const navigate = useNavigate();
+  const [addingId, setAddingId] = useState(null);
 
   const [scrolled, setScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -262,6 +274,23 @@ function AllProducts() {
   const getTotalStock = (sizes) =>
     Array.isArray(sizes) ? sizes.reduce((s, sz) => s + (sz.stock || 0), 0) : 0;
 
+  const handleAddToCartClick = async (e, productId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    setAddingId(productId);
+    try {
+      await handleAddToCart(productId, 1);
+    } catch (err) {
+      console.error("Add to cart failed:", err);
+    } finally {
+      setAddingId(null);
+    }
+  };
+
   const navProps = {
     scrolled,
     user,
@@ -269,6 +298,7 @@ function AllProducts() {
     setIsProfileOpen,
     handleLogout,
     setActiveCategory,
+    navCartTotal,
   };
 
   // ── Loading ──────────────────────────────────────────────
@@ -443,6 +473,23 @@ function AllProducts() {
                             <span className="text-[9px] uppercase tracking-widest text-stone-500">
                               Sold out
                             </span>
+                          </div>
+                        )}
+                        {/* Hover Add to Cart overlay */}
+                        {totalStock > 0 && (
+                          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                            <button
+                              onClick={(e) => handleAddToCartClick(e, id)}
+                              disabled={addingId === id}
+                              className="w-full py-2.5 bg-[#1A1C19] text-white text-[9px] uppercase tracking-[0.2em] font-semibold flex items-center justify-center gap-2 hover:bg-[#2d3028] transition-colors disabled:opacity-60 cursor-pointer"
+                            >
+                              {addingId === id ? (
+                                <span className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <ShoppingCart size={12} />
+                              )}
+                              {addingId === id ? "Adding…" : "Add to Cart"}
+                            </button>
                           </div>
                         )}
                       </div>

@@ -1,4 +1,4 @@
-import express from "express";
+﻿import express from "express";
 import multer from "multer";
 import { authProduct } from "../middleware/authProduct.middleware.js";
 import { 
@@ -39,3 +39,4 @@ router.delete("/:id", authProduct, deleteProduct);
 router.patch("/:id/toggle-active", authProduct, toggleProductStatus);
 
 export default router;
+

@@ -1,4 +1,4 @@
-import ImageKit from "@imagekit/nodejs";
+﻿import ImageKit from "@imagekit/nodejs";
 import config from "../config/config.js";
 
 const client = new ImageKit({
@@ -21,3 +21,4 @@ export async function uploadFile({ buffer, fileName = "outfy" }) {
     throw error;
   }
 }
+

@@ -8,10 +8,11 @@ import CreateProduct from "../feature/products/pages/CreateProduct";
 import EditProduct from "../feature/products/pages/EditProduct";
 import ProductDetails from "../feature/products/pages/ProductDetails";
 import AllProducts from "../feature/products/pages/AllProducts";
+import Cart from "../feature/cart/pages/Cart";
 
 const ProtectedAuthRoute = ({ children }) => {
-  const hasToken = document.cookie.includes("token=");
-  if (hasToken) {
+  const user = useSelector((state) => state.auth?.user);
+  if (user) {
     return <Navigate to="/" replace />;
   }
   return children;
@@ -28,6 +29,14 @@ const ProtectedSellerRoute = ({ children }) => {
     return <Navigate to="/" replace />;
   }
 
+  return children;
+};
+
+const ProtectedUserRoute = ({ children }) => {
+  const user = useSelector((state) => state.auth?.user);
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
   return children;
 };
 
@@ -88,6 +97,14 @@ export const routes = createBrowserRouter([
       //   <ProductDetails />
       // </ProtectedSellerRoute>
       <ProductDetails />
+    ),
+  },
+  {
+    path: "/cart",
+    element: (
+      <ProtectedUserRoute>
+        <Cart />
+      </ProtectedUserRoute>
     ),
   },
 ]);
