@@ -2,25 +2,39 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import { useProduct } from "../hooks/useProduct";
 import { useCart } from "../../cart/hooks/useCart";
-import { ArrowLeft, Edit2, ShieldCheck, Truck, RefreshCcw, ShoppingCart } from "lucide-react";
+import {
+  ArrowLeft,
+  Edit2,
+  ShieldCheck,
+  Truck,
+  RefreshCcw,
+  ShoppingCart,
+  Shirt,
+  Ruler,
+  Grid3X3,
+  Calendar,
+  Tag,
+  Package,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector } from "react-redux";
 
 // ── tiny helper ──────────────────────────────────────────────────
-function SpecRow({ label, value }) {
-  if (!value) return null;
-  return (
-    <div className="flex justify-between items-center py-2.5 border-b border-[#EAE8E3] last:border-0">
-      <span className="text-[10px] uppercase tracking-widest font-bold text-stone-400">{label}</span>
-      <span className="text-xs font-medium text-[#1A1C19] text-right max-w-[55%]">{value}</span>
-    </div>
-  );
-}
+// function SpecRow({ label, value }) {
+//   if (!value) return null;
+//   return (
+//     <div className="flex justify-between items-center py-2.5 border-b border-[#EAE8E3] last:border-0">
+//       <span className="text-[10px] uppercase tracking-widest font-bold text-stone-400">{label}</span>
+//       <span className="text-xs font-medium text-[#1A1C19] text-right max-w-[55%]">{value}</span>
+//     </div>
+//   );
+// }
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { handleGetProductById, handleGetAllProducts, isLoading, error } = useProduct();
+  const { handleGetProductById, handleGetAllProducts, isLoading, error } =
+    useProduct();
   const { handleAddToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
@@ -28,9 +42,16 @@ export default function ProductDetails() {
   const [selectedSize, setSelectedSize] = useState(null);
   const [addingToCart, setAddingToCart] = useState(false);
   const [addedFeedback, setAddedFeedback] = useState(false);
+  const [feedbackType, setFeedbackType] = useState("success"); // 'success' or 'already-added'
+  const [isInCart, setIsInCart] = useState(false);
   const user = useSelector((state) => state.auth?.user);
+  const cart = useSelector((state) => state.cart?.items || []);
+  const totalCartItems = cart.length;
   const isSeller = user?.isSeller || user?.role === "seller";
-  const isProductOwner = isSeller && product && (product.seller === user.id || product.seller?._id === user.id);
+  const isProductOwner =
+    isSeller &&
+    product &&
+    (product.seller === user.id || product.seller?._id === user.id);
 
   // fetch current product
   useEffect(() => {
@@ -49,14 +70,41 @@ export default function ProductDetails() {
     setActiveImage(0);
   }, [id]);
 
+  // Monitor cart changes and update button state
+  useEffect(() => {
+    if (product) {
+      const itemInCart = cart.some(
+        (item) =>
+          item.product?._id === product?._id ||
+          item.product?.id === product?.id,
+      );
+      setIsInCart(itemInCart);
+    }
+  }, [cart, product]);
+
+  const isItemInCart = cart.some(
+    (item) =>
+      item.product?._id === product?._id || item.product?.id === product?.id,
+  );
+
   const handleAddToCartClick = async () => {
     if (!user) {
       navigate("/login");
       return;
     }
+
+    // Check if item is already in cart
+    if (isInCart) {
+      setFeedbackType("already-added");
+      setAddedFeedback(true);
+      setTimeout(() => setAddedFeedback(false), 2000);
+      return;
+    }
+
     setAddingToCart(true);
     try {
       await handleAddToCart(product._id, 1);
+      setFeedbackType("success");
       setAddedFeedback(true);
       setTimeout(() => setAddedFeedback(false), 2000);
     } catch (err) {
@@ -91,7 +139,10 @@ export default function ProductDetails() {
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex flex-col items-center justify-center p-6">
         <p className="text-red-500 mb-4">{error || "Product not found."}</p>
-        <Link to={isSeller ? "/seller" : "/"} className="text-[#827668] underline text-sm">
+        <Link
+          to={isSeller ? "/seller" : "/"}
+          className="text-[#827668] underline text-sm"
+        >
           {isSeller ? "Return to Dashboard" : "Back to Shop"}
         </Link>
       </div>
@@ -105,11 +156,29 @@ export default function ProductDetails() {
 
   const hasDiscount = product.discountPercentage > 0;
   const currency = product.currency || "INR";
-  const totalStock = product.sizes?.reduce((s, x) => s + (x.stock || 0), 0) ?? 0;
+  const totalStock =
+    product.sizes?.reduce((s, x) => s + (x.stock || 0), 0) ?? 0;
+
+  const specs = [
+    { label: "Left in Stock", value: `${totalStock} units`, icon: Package },
+    { label: "Fabric", value: product.fabric, icon: Shirt },
+    { label: "Fit", value: product.fit, icon: Ruler },
+    { label: "Pattern", value: product.pattern, icon: Grid3X3 },
+    { label: "Sleeve", value: product.sleeveType, icon: Shirt },
+    {
+      label: "Occasion",
+      value: product.occasion?.length ? product.occasion.join(", ") : null,
+      icon: Calendar,
+    },
+    {
+      label: "Tags",
+      value: product.tags?.length ? product.tags.join(", ") : null,
+      icon: Tag,
+    },
+  ].filter((s) => s.value);
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans" style={{ zoom: 0.9 }}>
-
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans">
       {/* ── Navbar ────────────────────────────────────── */}
       <nav className="border-b border-[#EAE8E3] bg-white sticky top-0 z-10 px-5 py-3 flex items-center justify-between">
         <Link
@@ -119,16 +188,40 @@ export default function ProductDetails() {
           <ArrowLeft className="w-3.5 h-3.5" />
           {isSeller ? "Back to Dashboard" : "Back to Shop"}
         </Link>
-        <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-stone-400">
-          {isSeller ? "Seller Preview Mode" : "Product Details"}
+        <div className="flex items-center gap-4">
+          <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-stone-400">
+            {isSeller ? "Seller Preview Mode" : "Product Details"}
+          </div>
+          <Link
+            to="/cart"
+            className="relative hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+              />
+            </svg>
+            {totalCartItems > 0 && (
+              <span className="absolute -top-2 -right-2 bg-[#1A1C19] text-white text-[9px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1 leading-none">
+                {totalCartItems > 99 ? "99+" : totalCartItems}
+              </span>
+            )}
+          </Link>
         </div>
       </nav>
 
       <main className="max-w-5xl mx-auto px-5 py-8 lg:py-12">
-
         {/* ── Hero Grid ─────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
-
           {/* Left: Image Gallery */}
           <div className="space-y-4">
             <motion.div
@@ -162,7 +255,11 @@ export default function ProductDetails() {
                         : "border-transparent opacity-50 hover:opacity-90"
                     }`}
                   >
-                    <img src={img} alt="thumb" className="w-full h-full object-cover" />
+                    <img
+                      src={img}
+                      alt="thumb"
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -195,9 +292,14 @@ export default function ProductDetails() {
             </h1>
 
             {/* Description */}
-            <p className="text-stone-500 mb-5 leading-relaxed font-light text-[13px]">
-              {product.description}
-            </p>
+            <div className="mb-5">
+              <h3 className="text-sm font-bold text-[#1A1C19] mb-2 uppercase tracking-widest">
+                Description
+              </h3>
+              <p className="text-stone-500 leading-relaxed font-light text-sm">
+                {product.description}
+              </p>
+            </div>
 
             {/* Price */}
             <div className="mb-5 space-y-1">
@@ -207,7 +309,8 @@ export default function ProductDetails() {
                   {product.finalPrice ||
                     Math.round(
                       product.originalPrice -
-                        product.originalPrice * (product.discountPercentage / 100)
+                        product.originalPrice *
+                          (product.discountPercentage / 100),
                     )}
                 </span>
                 {hasDiscount && (
@@ -240,37 +343,77 @@ export default function ProductDetails() {
                       }`}
                     >
                       {s.size}
-                      <span className="text-[10px] opacity-50">({s.stock})</span>
+                      <span className="text-[10px] opacity-50">
+                        ({s.stock})
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* ── Inline Specs ───────────────────────────── */}
-            <div className="mb-5 bg-white rounded-2xl border border-stone-100 px-4 py-1 shadow-sm">
-              <SpecRow label="Total Stock" value={`${totalStock} units`} />
-              <SpecRow label="Fabric" value={product.fabric} />
-              <SpecRow label="Fit" value={product.fit} />
-              <SpecRow label="Pattern" value={product.pattern} />
-              <SpecRow label="Sleeve" value={product.sleeveType} />
-              <SpecRow label="Occasion" value={product.occasion?.length ? product.occasion.join(", ") : null} />
-              <SpecRow label="Tags" value={product.tags?.length ? product.tags.join(", ") : null} />
+            {/* ── Product Specifications ───────────────────────────── */}
+            <div className="mb-5">
+              <h3 className="text-sm font-bold text-[#1A1C19] mb-3 uppercase tracking-widest">
+                Product Specifications
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {specs.map(({ label, value, icon: Icon }) => (
+                  <div
+                    key={label}
+                    className="bg-white border border-stone-100 rounded-xl p-4 flex items-start gap-3 shadow-sm"
+                  >
+                    <Icon className="w-4 h-4 text-[#827668] mt-0.5" />
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest font-bold text-[#827668]">
+                        {label}
+                      </p>
+                      <p className="text-xs font-medium text-[#1A1C19] leading-tight">
+                        {value}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* ── Policies strip ─────────────────────────── */}
-            <div className="mb-5 grid grid-cols-3 gap-3">
-              {[
-                { Icon: ShieldCheck, label: "Care", value: product.careInstructions || "Standard wash" },
-                { Icon: RefreshCcw, label: "Returns", value: product.returnPolicy || "Standard policy" },
-                { Icon: Truck,       label: "Delivery", value: product.deliveryInfo || "3–5 business days" },
-              ].map(({ Icon, label, value }) => (
-                <div key={label} className="bg-white border border-stone-100 rounded-xl p-3 flex flex-col gap-1.5">
-                  <Icon className="w-3.5 h-3.5 text-[#827668]" />
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-[#1A1C19]">{label}</p>
-                  <p className="text-[10px] text-stone-400 font-light leading-snug">{value}</p>
-                </div>
-              ))}
+            {/* ── Policies & Care ─────────────────────────── */}
+            <div className="mb-5">
+              <h3 className="text-sm font-bold text-[#1A1C19] mb-3 uppercase tracking-widest">
+                Policies & Care
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  {
+                    Icon: ShieldCheck,
+                    label: "Care",
+                    value: product.careInstructions || "Standard wash",
+                  },
+                  {
+                    Icon: RefreshCcw,
+                    label: "Returns",
+                    value: product.returnPolicy || "Standard policy",
+                  },
+                  {
+                    Icon: Truck,
+                    label: "Delivery",
+                    value: product.deliveryInfo || "3–5 business days",
+                  },
+                ].map(({ Icon, label, value }) => (
+                  <div
+                    key={label}
+                    className="bg-white border border-stone-100 rounded-xl p-3 flex flex-col gap-1.5"
+                  >
+                    <Icon className="w-3.5 h-3.5 text-[#827668]" />
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-[#1A1C19]">
+                      {label}
+                    </p>
+                    <p className="text-[10px] text-stone-400 font-light leading-snug">
+                      {value}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* CTA */}
@@ -292,12 +435,16 @@ export default function ProductDetails() {
               ) : (
                 <button
                   onClick={handleAddToCartClick}
-                  disabled={addingToCart}
-                  className="w-full bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#2d3028] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-stone-200 disabled:opacity-60 cursor-pointer"
+                  disabled={addingToCart || isInCart}
+                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 shadow-lg shadow-stone-200 ${
+                    isInCart
+                      ? "bg-green-500 text-white cursor-not-allowed"
+                      : "bg-[#1A1C19] text-white hover:bg-[#2d3028] active:scale-[0.98] disabled:opacity-60"
+                  }`}
                 >
                   {addingToCart ? (
                     <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : addedFeedback ? (
+                  ) : isInCart ? (
                     <>
                       <span>✓</span> Added to Cart
                     </>
@@ -310,7 +457,13 @@ export default function ProductDetails() {
               )}
               {!user && (
                 <p className="text-center text-[9px] uppercase tracking-wider text-stone-400">
-                  <Link to="/login" className="underline hover:text-[#1A1C19] transition-colors">Sign in</Link> to add items to your cart
+                  <Link
+                    to="/login"
+                    className="underline hover:text-[#1A1C19] transition-colors"
+                  >
+                    Sign in
+                  </Link>{" "}
+                  to add items to your cart
                 </p>
               )}
             </div>
@@ -328,7 +481,9 @@ export default function ProductDetails() {
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="font-serif text-2xl tracking-tighter text-[#1A1C19]">More Products</h2>
+                <h2 className="font-serif text-2xl tracking-tighter text-[#1A1C19]">
+                  More Products
+                </h2>
                 <p className="text-[10px] uppercase tracking-widest text-[#827668] font-bold mt-0.5">
                   Explore the full collection
                 </p>
@@ -342,10 +497,18 @@ export default function ProductDetails() {
             >
               {moreProducts.map((p) => {
                 const pid = p._id || p.id;
-                const thumb = p.images?.[0]?.url || p.images?.[0] || "/outfy-fashion-model.png";
+                const thumb =
+                  p.images?.[0]?.url ||
+                  p.images?.[0] ||
+                  "/outfy-fashion-model.png";
                 const pDiscount = p.discountPercentage > 0;
                 const pCurrency = p.currency || "INR";
-                const pPrice = p.finalPrice || Math.round(p.originalPrice - p.originalPrice * (p.discountPercentage / 100));
+                const pPrice =
+                  p.finalPrice ||
+                  Math.round(
+                    p.originalPrice -
+                      p.originalPrice * (p.discountPercentage / 100),
+                  );
 
                 return (
                   <motion.button
@@ -370,14 +533,20 @@ export default function ProductDetails() {
                     </div>
 
                     {/* Info */}
-                    <p className="text-xs font-medium text-[#1A1C19] truncate leading-tight">{p.title}</p>
+                    <p className="text-xs font-medium text-[#1A1C19] truncate leading-tight">
+                      {p.title}
+                    </p>
                     <p className="text-[10px] text-stone-400 uppercase tracking-widest truncate mb-1">
                       {p.category || "General"}
                     </p>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-[#1A1C19]">{pCurrency} {pPrice}</span>
+                      <span className="text-xs font-bold text-[#1A1C19]">
+                        {pCurrency} {pPrice}
+                      </span>
                       {pDiscount && (
-                        <span className="text-[10px] text-stone-400 line-through">{p.originalPrice}</span>
+                        <span className="text-[10px] text-stone-400 line-through">
+                          {p.originalPrice}
+                        </span>
                       )}
                     </div>
                   </motion.button>
@@ -386,7 +555,6 @@ export default function ProductDetails() {
             </div>
           </motion.section>
         )}
-
       </main>
     </div>
   );

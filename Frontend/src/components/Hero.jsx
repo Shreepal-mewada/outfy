@@ -19,7 +19,7 @@ const Hero = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const user = useSelector((state) => state.auth?.user);
   const cartItems = useSelector((state) => state.cart?.items || []);
-  const totalCartItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalCartItems = cartItems.length;
   const navigate = useNavigate();
   const { handleLogout } = useAuth();
 
@@ -36,10 +36,11 @@ const Hero = () => {
     <main className="relative min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans overflow-x-hidden">
       {/* Navigation */}
       <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+          scrolled
             ? "bg-[#FAF8F5]/90 backdrop-blur-md shadow-sm py-4"
             : "bg-transparent py-6"
-          }`}
+        }`}
       >
         <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
           <div className="hidden md:flex space-x-8 text-[11px] uppercase tracking-widest font-semibold text-stone-600">
@@ -106,7 +107,10 @@ const Hero = () => {
                 />
               </svg>
             </button>
-            <Link to="/cart" className="relative hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
+            <Link
+              to="/cart"
+              className="relative hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

@@ -41,10 +41,11 @@ function InlineNav({
 }) {
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+        scrolled
           ? "bg-[#FAF9F7]/90 backdrop-blur-md shadow-sm py-4"
           : "bg-[#FAF9F7] py-6"
-        }`}
+      }`}
     >
       <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
         {/* Left links */}
@@ -85,7 +86,10 @@ function InlineNav({
         {/* Right actions */}
         <div className="flex items-center space-x-5 text-stone-700">
           {/* Cart icon with badge */}
-          <Link to="/cart" className="relative hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
+          <Link
+            to="/cart"
+            className="relative hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -183,7 +187,7 @@ function AllProducts() {
   const { handleGetAllProducts } = useProduct();
   const user = useSelector((state) => state.auth?.user);
   const cartItems = useSelector((state) => state.cart?.items || []);
-  const navCartTotal = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const navCartTotal = cartItems.length;
   const { handleLogout } = useAuth();
   const { handleAddToCart } = useCart();
   const navigate = useNavigate();
@@ -348,7 +352,7 @@ function AllProducts() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <h1
                 className="text-4xl md:text-5xl font-semibold uppercase tracking-[0.1em] text-[#1A1C19] font-BlinkMacSystemFont"
-              // style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
+                // style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
               >
                 All Products
               </h1>
@@ -384,10 +388,11 @@ function AllProducts() {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest transition-all duration-300 ${activeCategory === cat
+                  className={`px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest transition-all duration-300 ${
+                    activeCategory === cat
                       ? "bg-[#1A1C19] text-white"
                       : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
-                    }`}
+                  }`}
                 >
                   {cat}
                 </button>

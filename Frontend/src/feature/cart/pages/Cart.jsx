@@ -7,7 +7,8 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
 
 const Cart = () => {
   const { items, loading, error } = useSelector((state) => state.cart);
-  const { handleGetCart, handleUpdateCartItem, handleRemoveFromCart } = useCart();
+  const { handleGetCart, handleUpdateCartItem, handleRemoveFromCart } =
+    useCart();
 
   useEffect(() => {
     handleGetCart();
@@ -62,21 +63,20 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-[#FAF9F7] text-[#1A1C19] font-sans">
-      {/* ── Minimal Nav ── */}
       <nav className="fixed top-0 w-full z-50 bg-[#FAF9F7]/90 backdrop-blur-md border-b border-stone-200/60 py-4">
         <div className="max-w-6xl mx-auto px-6 md:px-12 flex justify-between items-center">
+          <Link
+            to="/products"
+            className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-[#1A1C19] hover:text-[#827668] transition-colors font-medium"
+          >
+            <ArrowLeft size={14} />
+            Continue Shopping
+          </Link>
           <Link
             to="/"
             className="text-2xl tracking-tighter text-[#1A1C19] font-semibold"
           >
             OUTFY<span className="text-red-500">.</span>
-          </Link>
-          <Link
-            to="/products"
-            className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-stone-500 hover:text-[#1A1C19] transition-colors"
-          >
-            <ArrowLeft size={13} />
-            Continue Shopping
           </Link>
         </div>
       </nav>
@@ -149,7 +149,11 @@ const Cart = () => {
                       layout
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -30, transition: { duration: 0.25 } }}
+                      exit={{
+                        opacity: 0,
+                        x: -30,
+                        transition: { duration: 0.25 },
+                      }}
                       transition={{
                         duration: 0.45,
                         delay: index * 0.06,

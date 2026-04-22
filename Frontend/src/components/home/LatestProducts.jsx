@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router";
@@ -98,6 +98,13 @@ const LatestProducts = () => {
 
   const activeProduct = products[activeIndex];
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      next();
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <motion.section
