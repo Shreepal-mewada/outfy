@@ -1,14 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../hooks/useCart";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { loadRazorpay } from "../../../utils/loadRazorpay";
+import { createOrder, verifyPayment } from "../../payment/services/payment.api";
 
 const Cart = () => {
   const { items, loading, error } = useSelector((state) => state.cart);
-  const { handleGetCart, handleUpdateCartItem, handleRemoveFromCart } =
-    useCart();
+  const user = useSelector((state) => state.auth?.user);
+  const { handleGetCart, handleUpdateCartItem, handleRemoveFromCart } = useCart();
+  const navigate = useNavigate();
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   useEffect(() => {
     handleGetCart();
@@ -37,6 +41,82 @@ const Cart = () => {
   }, 0);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handlePayment = async () => {
+    if (!user) {
+      alert("Please login to proceed with the payment.");
+      navigate("/login");
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    const res = await loadRazorpay();
+
+    if (!res) {
+      alert("Razorpay SDK failed to load. Are you online?");
+      setIsProcessingPayment(false);
+      return;
+    }
+
+    try {
+      const orderData = await createOrder();
+
+      if (!orderData || !orderData.order) {
+        alert("Server error. Please try again.");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      const options = {
+        key: orderData.key_id,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: "Outfy Store",
+        description: "Test Transaction",
+        order_id: orderData.order.id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            if (verifyRes.success) {
+              alert("Payment Successful!");
+              await handleGetCart(); // refresh the cart (should be empty now)
+              navigate("/");
+            } else {
+              alert("Payment verification failed.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Error verifying payment.");
+          }
+        },
+        prefill: {
+          name: user.fullname || "",
+          email: user.email || "",
+          contact: user.phone || "9999999999",
+        },
+        theme: {
+          color: "#1A1C19",
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.on('payment.failed', function (response){
+        alert("Payment Failed: " + response.error.description);
+      });
+      paymentObject.open();
+
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to create order.");
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading && items.length === 0)
@@ -290,8 +370,19 @@ const Cart = () => {
                   </div>
                 </div>
 
-                <button className="w-full py-4 bg-[#1A1C19] text-white text-[10px] uppercase tracking-[0.35em] font-semibold rounded-xl hover:bg-[#2d3028] active:scale-[0.98] transition-all duration-200 cursor-pointer">
-                  Proceed to Checkout
+                <button 
+                  onClick={handlePayment}
+                  disabled={isProcessingPayment}
+                  className="w-full py-4 bg-[#1A1C19] text-white text-[10px] uppercase tracking-[0.35em] font-semibold rounded-xl hover:bg-[#2d3028] active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                >
+                  {isProcessingPayment ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Proceed to Checkout"
+                  )}
                 </button>
 
                 <p className="mt-4 text-center text-[9px] uppercase tracking-wider text-stone-300">
