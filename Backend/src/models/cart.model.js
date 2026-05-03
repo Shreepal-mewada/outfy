@@ -1,4 +1,4 @@
-﻿import mongoose from "mongoose";
+import mongoose from "mongoose";
 
 const cartSchema = new mongoose.Schema({
   user: {
@@ -12,6 +12,9 @@ const cartSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true
+    },
+    size: {
+      type: String
     },
     quantity: {
       type: Number,

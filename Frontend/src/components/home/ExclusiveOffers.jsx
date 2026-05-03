@@ -6,7 +6,6 @@ const ExclusiveOffers = () => {
   return (
     <section className="py-24 px-6 md:px-22 bg-[#FAF8F5]">
       <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-12 lg:gap-24">
-        
         {/* Text Content */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -16,14 +15,16 @@ const ExclusiveOffers = () => {
           className="flex-1 max-w-md"
         >
           <h2 className="text-3xl md:text-4xl font-serif text-[#1A1C19] leading-tight mb-6">
-            Exclusive Offers for <br className="hidden md:block" /> a Limited Time
+            Exclusive Offers for <br className="hidden md:block" /> a Limited
+            Time
           </h2>
           <p className="text-sm text-stone-500 mb-8 leading-relaxed">
-            Modern and stylish fashion store website design with a clean layout and elegant product showcase.
+            Modern and stylish fashion store website design with a clean layout
+            and elegant product showcase.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
-              to="/"
+              to="/products"
               className="bg-[#827668] text-white text-[11px] uppercase tracking-widest py-3.5 px-8 rounded-full hover:bg-[#6c6155] transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
             >
               Shop Now
@@ -54,7 +55,6 @@ const ExclusiveOffers = () => {
             />
           </div>
         </motion.div>
-        
       </div>
     </section>
   );

@@ -75,21 +75,26 @@ export default function ProductDetails() {
     if (product) {
       const itemInCart = cart.some(
         (item) =>
-          item.product?._id === product?._id ||
-          item.product?.id === product?.id,
+          (item.product?._id === product?._id ||
+          item.product?.id === product?.id) && (!product?.sizes?.length || item.size === selectedSize),
       );
       setIsInCart(itemInCart);
     }
-  }, [cart, product]);
+  }, [cart, product, selectedSize]);
 
   const isItemInCart = cart.some(
     (item) =>
-      item.product?._id === product?._id || item.product?.id === product?.id,
+      (item.product?._id === product?._id || item.product?.id === product?.id) && (!product?.sizes?.length || item.size === selectedSize),
   );
 
   const handleAddToCartClick = async () => {
     if (!user) {
       navigate("/login");
+      return;
+    }
+
+    if (product.sizes?.length > 0 && !selectedSize) {
+      alert("Please select a size before adding to cart.");
       return;
     }
 
@@ -103,7 +108,7 @@ export default function ProductDetails() {
 
     setAddingToCart(true);
     try {
-      await handleAddToCart(product._id, 1);
+      await handleAddToCart(product._id, 1, selectedSize);
       setFeedbackType("success");
       setAddedFeedback(true);
       setTimeout(() => setAddedFeedback(false), 2000);
@@ -330,52 +335,51 @@ export default function ProductDetails() {
             {product.sizes?.length > 0 && (
               <div className="mb-5">
                 <p className="text-[10px] uppercase tracking-widest text-[#827668] font-bold mb-2">
-                  Available Sizes
+                  Select Size
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {product.sizes.map((s, idx) => (
-                    <div
+                    <button
                       key={idx}
-                      className={`border px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 ${
+                      onClick={() => s.stock > 0 && setSelectedSize(s.size)}
+                      disabled={s.stock === 0}
+                      className={`border px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
                         s.stock > 0
-                          ? "border-[#1A1C19] text-[#1A1C19] bg-white"
-                          : "border-stone-200 text-stone-300 bg-stone-50"
+                          ? selectedSize === s.size
+                            ? "border-[#1A1C19] bg-[#1A1C19] text-white"
+                            : "border-[#EAE8E3] text-[#1A1C19] bg-white hover:border-[#1A1C19]"
+                          : "border-stone-200 text-stone-300 bg-stone-50 cursor-not-allowed"
                       }`}
                     >
                       {s.size}
-                      <span className="text-[10px] opacity-50">
+                      <span className={`text-[10px] ${selectedSize === s.size ? "opacity-80" : "opacity-50"}`}>
                         ({s.stock})
                       </span>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
             )}
 
             {/* ── Product Specifications ───────────────────────────── */}
-            <div className="mb-5">
-              <h3 className="text-sm font-bold text-[#1A1C19] mb-3 uppercase tracking-widest">
-                Product Specifications
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {specs.map(({ label, value, icon: Icon }) => (
-                  <div
-                    key={label}
-                    className="bg-white border border-stone-100 rounded-xl p-4 flex items-start gap-3 shadow-sm"
-                  >
-                    <Icon className="w-4 h-4 text-[#827668] mt-0.5" />
-                    <div>
-                      <p className="text-[10px] uppercase tracking-widest font-bold text-[#827668]">
-                        {label}
-                      </p>
-                      <p className="text-xs font-medium text-[#1A1C19] leading-tight">
-                        {value}
-                      </p>
+            {specs.length > 0 && (
+              <div className="mb-5 pt-4 border-t border-[#EAE8E3]">
+                <h3 className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">
+                  Product Details
+                </h3>
+                <div className="grid grid-cols-2 gap-y-2 gap-x-6">
+                  {specs.map(({ label, value }) => (
+                    <div
+                      key={label}
+                      className="flex items-center justify-between text-sm py-1 border-b border-[#EAE8E3] border-dashed last:border-0"
+                    >
+                      <span className="text-stone-500 font-light">{label}</span>
+                      <span className="text-[#1A1C19] font-medium text-right">{value}</span>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* ── Policies & Care ─────────────────────────── */}
             <div className="mb-5">

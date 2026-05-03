@@ -18,17 +18,17 @@ const Cart = () => {
     handleGetCart();
   }, []);
 
-  const handleIncrement = async (productId, currentQty) => {
-    await handleUpdateCartItem(productId, currentQty + 1);
+  const handleIncrement = async (productId, currentQty, size) => {
+    await handleUpdateCartItem(productId, currentQty + 1, size);
   };
 
-  const handleDecrement = async (productId, currentQty) => {
+  const handleDecrement = async (productId, currentQty, size) => {
     if (currentQty <= 1) return; // Use explicit Remove button for deletion
-    await handleUpdateCartItem(productId, currentQty - 1);
+    await handleUpdateCartItem(productId, currentQty - 1, size);
   };
 
-  const handleRemove = async (productId) => {
-    await handleRemoveFromCart(productId);
+  const handleRemove = async (productId, size) => {
+    await handleRemoveFromCart(productId, size);
   };
 
   const subtotal = items.reduce((sum, item) => {
@@ -271,10 +271,15 @@ const Cart = () => {
                           </p>
                           <Link
                             to={`/product/${product._id}`}
-                            className="text-sm font-medium text-[#1A1C19] truncate block hover:underline underline-offset-2 transition-all mb-2"
+                            className="text-sm font-medium text-[#1A1C19] truncate block hover:underline underline-offset-2 transition-all mb-1"
                           >
                             {product.title}
                           </Link>
+                          {item.size && (
+                            <p className="text-[10px] text-stone-500 uppercase tracking-widest mb-2">
+                              Size: {item.size}
+                            </p>
+                          )}
                           <p className="text-sm font-semibold text-[#1A1C19]">
                             {product.currency || "INR"} {price}
                           </p>
@@ -286,7 +291,7 @@ const Cart = () => {
                           <div className="flex items-center gap-3 border border-stone-200 rounded-full px-3 py-1.5">
                             <button
                               onClick={() =>
-                                handleDecrement(product._id, item.quantity)
+                                handleDecrement(product._id, item.quantity, item.size)
                               }
                               disabled={item.quantity <= 1 || loading}
                               className="text-stone-400 hover:text-[#1A1C19] transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
@@ -299,7 +304,7 @@ const Cart = () => {
                             </span>
                             <button
                               onClick={() =>
-                                handleIncrement(product._id, item.quantity)
+                                handleIncrement(product._id, item.quantity, item.size)
                               }
                               disabled={loading}
                               className="text-stone-400 hover:text-[#1A1C19] transition-colors disabled:opacity-30 cursor-pointer"
@@ -311,7 +316,7 @@ const Cart = () => {
 
                           {/* Remove */}
                           <button
-                            onClick={() => handleRemove(product._id)}
+                            onClick={() => handleRemove(product._id, item.size)}
                             disabled={loading}
                             className="flex items-center gap-1.5 text-[9px] uppercase tracking-widest text-stone-400 hover:text-red-500 transition-colors disabled:opacity-30 cursor-pointer"
                             aria-label="Remove item"

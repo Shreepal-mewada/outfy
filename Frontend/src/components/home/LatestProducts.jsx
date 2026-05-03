@@ -193,7 +193,7 @@ const LatestProducts = () => {
             onClick={prev}
             className="w-10 h-10 rounded-full border border-stone-300 bg-white text-[#1A1C19]
               flex items-center justify-center hover:bg-[#1A1C19] hover:text-white
-              hover:border-[#1A1C19] transition-all duration-200 shadow-sm"
+              hover:border-[#1A1C19] transition-all duration-200 shadow-sm cursor-pointer"
           >
             <ChevronLeft size={17} />
           </button>
@@ -203,7 +203,7 @@ const LatestProducts = () => {
               navigate("/products");
             }}
             className="w-10 h-10 rounded-full bg-[#1A1C19] text-white flex items-center
-            justify-center shadow-md hover:bg-[#827668] transition-colors duration-200"
+            justify-center shadow-md hover:bg-[#827668] transition-colors duration-200 cursor-pointer"
           >
             <ShoppingCart size={15} />
           </button>
@@ -212,7 +212,7 @@ const LatestProducts = () => {
             onClick={next}
             className="w-10 h-10 rounded-full border border-stone-300 bg-white text-[#1A1C19]
               flex items-center justify-center hover:bg-[#1A1C19] hover:text-white
-              hover:border-[#1A1C19] transition-all duration-200 shadow-sm"
+              hover:border-[#1A1C19] transition-all duration-200 shadow-sm cursor-pointer"
           >
             <ChevronRight size={17} />
           </button>

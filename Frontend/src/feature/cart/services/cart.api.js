@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 
 const cartInstance = axios.create({
      baseURL : "http://localhost:3000/api/cart",
@@ -15,9 +15,9 @@ export const getCart = async () => {
      }
 };
 
-export const addToCart = async (productId, quantity = 1) => {
+export const addToCart = async (productId, quantity = 1, size) => {
      try {
-          const response = await cartInstance.post("/add", { productId, quantity });
+          const response = await cartInstance.post("/add", { productId, quantity, size });
           return response.data;
      } catch (error) {
           console.error("Error adding to cart:", error);
@@ -25,9 +25,9 @@ export const addToCart = async (productId, quantity = 1) => {
      }
 };
 
-export const updateCartItem = async (productId, quantity) => {
+export const updateCartItem = async (productId, quantity, size) => {
      try {
-          const response = await cartInstance.put("/update", { productId, quantity });
+          const response = await cartInstance.put("/update", { productId, quantity, size });
           return response.data;
      } catch (error) {
           console.error("Error updating cart item:", error);
@@ -35,9 +35,9 @@ export const updateCartItem = async (productId, quantity) => {
      }
 };
 
-export const removeFromCart = async (productId) => {
+export const removeFromCart = async (productId, size) => {
      try {
-          const response = await cartInstance.delete(`/${productId}`);
+          const response = await cartInstance.delete(`/${productId}`, { data: { size } });
           return response.data;
      } catch (error) {
           console.error("Error removing from cart:", error);

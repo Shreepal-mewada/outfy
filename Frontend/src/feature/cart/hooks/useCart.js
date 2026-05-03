@@ -1,4 +1,4 @@
-﻿import { getCart, addToCart, updateCartItem, removeFromCart } from "../services/cart.api";
+import { getCart, addToCart, updateCartItem, removeFromCart } from "../services/cart.api";
 import { useDispatch } from "react-redux";
 import { setCart, addItem, updateItem, removeItem, setLoading, setError } from "../state/cart.slice";
 
@@ -19,10 +19,10 @@ export const useCart = () => {
           }
      };
 
-     const handleAddToCart = async (productId, quantity = 1) => {
+     const handleAddToCart = async (productId, quantity = 1, size) => {
           try {
                dispatch(setLoading(true));
-               const response = await addToCart(productId, quantity);
+               const response = await addToCart(productId, quantity, size);
                dispatch(setCart(response));
                return response;
           } catch (error) {
@@ -33,10 +33,10 @@ export const useCart = () => {
           }
      };
 
-     const handleUpdateCartItem = async (productId, quantity) => {
+     const handleUpdateCartItem = async (productId, quantity, size) => {
           try {
                dispatch(setLoading(true));
-               const response = await updateCartItem(productId, quantity);
+               const response = await updateCartItem(productId, quantity, size);
                dispatch(setCart(response));
                return response;
           } catch (error) {
@@ -47,10 +47,10 @@ export const useCart = () => {
           }
      };
 
-     const handleRemoveFromCart = async (productId) => {
+     const handleRemoveFromCart = async (productId, size) => {
           try {
                dispatch(setLoading(true));
-               const response = await removeFromCart(productId);
+               const response = await removeFromCart(productId, size);
                dispatch(setCart(response));
                return response;
           } catch (error) {
