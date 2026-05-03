@@ -143,18 +143,19 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-[#FAF9F7] text-[#1A1C19] font-sans">
-      <nav className="fixed top-0 w-full z-50 bg-[#FAF9F7]/90 backdrop-blur-md border-b border-stone-200/60 py-4">
-        <div className="max-w-6xl mx-auto px-6 md:px-12 flex justify-between items-center">
+      <nav className="fixed top-0 w-full z-50 bg-[#FAF9F7]/90 backdrop-blur-md border-b border-stone-200/60 py-3 sm:py-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center">
           <Link
             to="/products"
-            className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-[#1A1C19] hover:text-[#827668] transition-colors font-medium"
+            className="flex items-center gap-2 text-[10px] md:text-[11px] uppercase tracking-widest text-[#1A1C19] hover:text-[#827668] transition-colors font-medium"
           >
-            <ArrowLeft size={14} />
-            Continue Shopping
+            <ArrowLeft size={14} className="w-3.5 h-3.5 sm:w-[14px] sm:h-[14px]" />
+            <span className="hidden sm:inline">Continue Shopping</span>
+            <span className="sm:hidden">Back</span>
           </Link>
           <Link
             to="/"
-            className="text-2xl tracking-tighter text-[#1A1C19] font-semibold"
+            className="text-xl sm:text-2xl tracking-tighter text-[#1A1C19] font-semibold"
           >
             OUTFY<span className="text-red-500">.</span>
           </Link>

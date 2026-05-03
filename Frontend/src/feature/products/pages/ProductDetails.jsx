@@ -185,16 +185,17 @@ export default function ProductDetails() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1A1C19] font-sans">
       {/* ── Navbar ────────────────────────────────────── */}
-      <nav className="border-b border-[#EAE8E3] bg-white sticky top-0 z-10 px-5 py-3 flex items-center justify-between">
+      <nav className="border-b border-[#EAE8E3] bg-white sticky top-0 z-10 px-4 md:px-5 py-3 flex items-center justify-between">
         <Link
           to={isSeller ? "/seller" : "/"}
-          className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-[#827668] hover:text-[#1A1C19] transition-colors font-bold"
+          className="flex items-center gap-2 text-[10px] md:text-xs uppercase tracking-widest text-[#827668] hover:text-[#1A1C19] transition-colors font-bold"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          {isSeller ? "Back to Dashboard" : "Back to Shop"}
+          <ArrowLeft className="w-4 h-4 md:w-3.5 md:h-3.5" />
+          <span className="hidden sm:inline">{isSeller ? "Back to Dashboard" : "Back to Shop"}</span>
+          <span className="sm:hidden">Back</span>
         </Link>
         <div className="flex items-center gap-4">
-          <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-stone-400">
+          <div className="hidden md:block text-[10px] uppercase tracking-[0.2em] font-bold text-stone-400">
             {isSeller ? "Seller Preview Mode" : "Product Details"}
           </div>
           <Link
@@ -224,9 +225,9 @@ export default function ProductDetails() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-5 py-8 lg:py-12">
+      <main className="max-w-5xl mx-auto px-4 sm:px-5 py-6 sm:py-8 lg:py-12 pb-32 lg:pb-12">
         {/* ── Hero Grid ─────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-14 items-start">
           {/* Left: Image Gallery */}
           <div className="space-y-4">
             <motion.div
@@ -292,7 +293,7 @@ export default function ProductDetails() {
             </div>
 
             {/* Title */}
-            <h1 className="font-serif text-3xl lg:text-[2.2rem] tracking-tighter leading-tight mb-3 text-[#1A1C19]">
+            <h1 className="font-serif text-2xl sm:text-3xl lg:text-[2.2rem] tracking-tighter leading-tight mb-3 text-[#1A1C19]">
               {product.title}
             </h1>
 
@@ -367,14 +368,14 @@ export default function ProductDetails() {
                 <h3 className="text-xs font-medium text-stone-500 mb-3 uppercase tracking-wider">
                   Product Details
                 </h3>
-                <div className="grid grid-cols-2 gap-y-2 gap-x-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 sm:gap-y-3 sm:gap-x-8">
                   {specs.map(({ label, value }) => (
                     <div
                       key={label}
-                      className="flex items-center justify-between text-sm py-1 border-b border-[#EAE8E3] border-dashed last:border-0"
+                      className="flex items-center justify-between text-sm py-1 border-b border-[#EAE8E3] border-dashed sm:last:border-b-0"
                     >
                       <span className="text-stone-500 font-light">{label}</span>
-                      <span className="text-[#1A1C19] font-medium text-right">{value}</span>
+                      <span className="text-[#1A1C19] font-medium text-right ml-4">{value}</span>
                     </div>
                   ))}
                 </div>
@@ -386,7 +387,7 @@ export default function ProductDetails() {
               <h3 className="text-sm font-bold text-[#1A1C19] mb-3 uppercase tracking-widest">
                 Policies & Care
               </h3>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {[
                   {
                     Icon: ShieldCheck,
@@ -406,13 +407,13 @@ export default function ProductDetails() {
                 ].map(({ Icon, label, value }) => (
                   <div
                     key={label}
-                    className="bg-white border border-stone-100 rounded-xl p-3 flex flex-col gap-1.5"
+                    className="bg-white border border-stone-100 rounded-xl p-2 sm:p-3 flex flex-col gap-1 sm:gap-1.5 items-center sm:items-start text-center sm:text-left"
                   >
-                    <Icon className="w-3.5 h-3.5 text-[#827668]" />
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-[#1A1C19]">
+                    <Icon className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#827668]" />
+                    <p className="text-[9px] sm:text-[10px] uppercase tracking-widest font-bold text-[#1A1C19]">
                       {label}
                     </p>
-                    <p className="text-[10px] text-stone-400 font-light leading-snug">
+                    <p className="text-[9px] sm:text-[10px] text-stone-400 font-light leading-snug">
                       {value}
                     </p>
                   </div>
@@ -421,18 +422,18 @@ export default function ProductDetails() {
             </div>
 
             {/* CTA */}
-            <div className="border-t border-[#EAE8E3] pt-5 flex flex-col gap-3">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-[#EAE8E3] z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] lg:static lg:p-0 lg:bg-transparent lg:border-t lg:border-[#EAE8E3] lg:pt-5 flex flex-col gap-3 lg:shadow-none">
               {isProductOwner ? (
                 <Link
                   to={`/seller/edit/${product._id}`}
-                  className="w-full bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#827668] transition-colors shadow-lg shadow-stone-200"
+                  className="w-full bg-[#1A1C19] text-white flex items-center justify-center gap-2 py-3.5 sm:py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#827668] transition-colors shadow-lg shadow-stone-200"
                 >
-                  <Edit2 className="w-3.5 h-3.5" /> Edit Listing
+                  <Edit2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> Edit Listing
                 </Link>
               ) : totalStock === 0 ? (
                 <button
                   disabled
-                  className="w-full bg-stone-100 text-stone-400 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed"
+                  className="w-full bg-stone-100 text-stone-400 flex items-center justify-center gap-2 py-3.5 sm:py-3 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed"
                 >
                   Out of Stock
                 </button>
@@ -440,27 +441,27 @@ export default function ProductDetails() {
                 <button
                   onClick={handleAddToCartClick}
                   disabled={addingToCart || isInCart}
-                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 shadow-lg shadow-stone-200 ${
+                  className={`w-full flex items-center justify-center gap-2 py-3.5 sm:py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 shadow-lg shadow-stone-200 ${
                     isInCart
                       ? "bg-green-500 text-white cursor-not-allowed"
                       : "bg-[#1A1C19] text-white hover:bg-[#2d3028] active:scale-[0.98] disabled:opacity-60"
                   }`}
                 >
                   {addingToCart ? (
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="w-5 h-5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : isInCart ? (
                     <>
                       <span>✓</span> Added to Cart
                     </>
                   ) : (
                     <>
-                      <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+                      <ShoppingCart className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> Add to Cart
                     </>
                   )}
                 </button>
               )}
               {!user && (
-                <p className="text-center text-[9px] uppercase tracking-wider text-stone-400">
+                <p className="text-center text-[9px] uppercase tracking-wider text-stone-400 pb-1 lg:pb-0">
                   <Link
                     to="/login"
                     className="underline hover:text-[#1A1C19] transition-colors"
