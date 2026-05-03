@@ -299,9 +299,9 @@ export default function ProductDetails() {
 
             {/* Description */}
             <div className="mb-5">
-              <h3 className="text-sm font-bold text-[#1A1C19] mb-2 uppercase tracking-widest">
+              {/* <h3 className="text-sm font-bold text-[#1A1C19] mb-2 uppercase tracking-widest">
                 Description
-              </h3>
+              </h3> */}
               <p className="text-stone-500 leading-relaxed font-light text-sm">
                 {product.description}
               </p>
