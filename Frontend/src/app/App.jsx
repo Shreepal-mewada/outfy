@@ -5,6 +5,7 @@ import { routes } from "./AppRoutes";
 import { useDispatch } from "react-redux";
 import { setUser } from "../feature/auth/state/auth.slice";
 import { getMe } from "../feature/auth/service/auth.api";
+import ChatbotWidget from "../components/common/ChatbotWidget";
 
 function App() {
   const dispatch = useDispatch();
@@ -56,6 +57,7 @@ function App() {
   return (
     <>
       <RouterProvider router={routes} />
+      <ChatbotWidget />
     </>
   );
 }
