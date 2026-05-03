@@ -1,4 +1,4 @@
-﻿import ProductModel from "../models/product.model.js";
+import ProductModel from "../models/product.model.js";
 import { uploadFile } from "../services/storage.service.js";
 
 // Helper to parse JSON fields safely
@@ -274,6 +274,7 @@ export async function getAllProducts(req, res) {
     const products = await ProductModel.find({ isActive: true }).sort({
       createdAt: -1,
     });
+    console.log("Found products length:", products.length);
     res.status(200).json({
       message: "Products fetched successfully",
       success: true,

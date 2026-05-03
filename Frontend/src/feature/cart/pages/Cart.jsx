@@ -10,7 +10,8 @@ import { createOrder, verifyPayment } from "../../payment/services/payment.api";
 const Cart = () => {
   const { items, loading, error } = useSelector((state) => state.cart);
   const user = useSelector((state) => state.auth?.user);
-  const { handleGetCart, handleUpdateCartItem, handleRemoveFromCart } = useCart();
+  const { handleGetCart, handleUpdateCartItem, handleRemoveFromCart } =
+    useCart();
   const navigate = useNavigate();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
@@ -105,11 +106,10 @@ const Cart = () => {
       };
 
       const paymentObject = new window.Razorpay(options);
-      paymentObject.on('payment.failed', function (response){
+      paymentObject.on("payment.failed", function (response) {
         alert("Payment Failed: " + response.error.description);
       });
       paymentObject.open();
-
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Failed to create order.");
@@ -149,7 +149,10 @@ const Cart = () => {
             to="/products"
             className="flex items-center gap-2 text-[10px] md:text-[11px] uppercase tracking-widest text-[#1A1C19] hover:text-[#827668] transition-colors font-medium"
           >
-            <ArrowLeft size={14} className="w-3.5 h-3.5 sm:w-[14px] sm:h-[14px]" />
+            <ArrowLeft
+              size={14}
+              className="w-3.5 h-3.5 sm:w-[14px] sm:h-[14px]"
+            />
             <span className="hidden sm:inline">Continue Shopping</span>
             <span className="sm:hidden">Back</span>
           </Link>
@@ -189,7 +192,7 @@ const Cart = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="flex flex-col items-center justify-center py-32 gap-6"
+            className="flex flex-col items-center justify-center py-8 gap-6"
           >
             <ShoppingBag size={44} className="text-stone-200" strokeWidth={1} />
             <div className="text-center">
@@ -292,7 +295,11 @@ const Cart = () => {
                           <div className="flex items-center gap-3 border border-stone-200 rounded-full px-3 py-1.5">
                             <button
                               onClick={() =>
-                                handleDecrement(product._id, item.quantity, item.size)
+                                handleDecrement(
+                                  product._id,
+                                  item.quantity,
+                                  item.size,
+                                )
                               }
                               disabled={item.quantity <= 1 || loading}
                               className="text-stone-400 hover:text-[#1A1C19] transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
@@ -305,7 +312,11 @@ const Cart = () => {
                             </span>
                             <button
                               onClick={() =>
-                                handleIncrement(product._id, item.quantity, item.size)
+                                handleIncrement(
+                                  product._id,
+                                  item.quantity,
+                                  item.size,
+                                )
                               }
                               disabled={loading}
                               className="text-stone-400 hover:text-[#1A1C19] transition-colors disabled:opacity-30 cursor-pointer"
@@ -376,7 +387,7 @@ const Cart = () => {
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={handlePayment}
                   disabled={isProcessingPayment}
                   className="w-full py-4 bg-[#1A1C19] text-white text-[10px] uppercase tracking-[0.35em] font-semibold rounded-xl hover:bg-[#2d3028] active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
