@@ -12,6 +12,7 @@ import SeasonalCollection from "./home/SeasonalCollection";
 import Testimonials from "./home/Testimonials";
 import Footer from "./home/Footer";
 import ImageSlider from "./CrazyComponents/jsx/ImageSlider";
+import GlobalSearch from "./common/GlobalSearch";
 
 const Hero = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -91,22 +92,7 @@ const Hero = () => {
           </Link>
 
           <div className="flex space-x-5 text-stone-700">
-            <button className="hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </svg>
-            </button>
+            <GlobalSearch />
             <Link
               to="/cart"
               className="relative hover:text-[#1A1C19] transition-transform hover:scale-110 duration-300 cursor-pointer"

@@ -35,6 +35,16 @@ export const getAllProducts = async () => {
      }
 };
 
+export const searchProductsAPI = async (query) => {
+     try {
+          const response = await productInstance.get(`/search?q=${encodeURIComponent(query)}`);
+          return response.data;
+     } catch (error) {
+          console.error("Error searching products:", error);
+          throw error;
+     }
+};
+
 export const getProductById = async (id) => {
      try {
           const response = await productInstance.get(`/${id}`);

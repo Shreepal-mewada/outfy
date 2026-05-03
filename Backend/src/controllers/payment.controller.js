@@ -20,8 +20,14 @@ export async function createOrder(req, res) {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
+    const validItems = cart.items.filter(item => item.product != null);
+    
+    if (validItems.length === 0) {
+      return res.status(400).json({ message: "Cart is empty or contains invalid items" });
+    }
+
     // Calculate total amount in INR
-    const totalAmount = cart.items.reduce((sum, item) => {
+    const totalAmount = validItems.reduce((sum, item) => {
       const price = item.product.finalPrice || item.product.priceAmount || item.product.originalPrice || 0;
       return sum + (price * item.quantity);
     }, 0);
@@ -36,7 +42,7 @@ export async function createOrder(req, res) {
     const razorpayOrder = await razorpay.orders.create(options);
 
     // Save order details to Database as PENDING
-    const orderItems = cart.items.map(item => ({
+    const orderItems = validItems.map(item => ({
       product: item.product._id,
       quantity: item.quantity,
       price: item.product.finalPrice || item.product.priceAmount || item.product.originalPrice || 0,

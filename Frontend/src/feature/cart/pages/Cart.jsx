@@ -216,7 +216,9 @@ const Cart = () => {
             <div className="space-y-0">
               <AnimatePresence mode="popLayout">
                 {items.map((item, index) => {
-                  const product = item.product;
+                  const product = item?.product;
+                  if (!product) return null;
+                  
                   const price =
                     product?.finalPrice ||
                     product?.priceAmount ||

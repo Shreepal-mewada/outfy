@@ -1,9 +1,9 @@
-﻿import express from "express";
+import express from "express";
 import multer from "multer";
 import { authProduct } from "../middleware/authProduct.middleware.js";
 import { 
   createProduct, getMyProducts, getAllProducts, 
-  getProductById, updateProduct, deleteProduct, toggleProductStatus 
+  getProductById, updateProduct, deleteProduct, toggleProductStatus, searchProducts
 } from "../controllers/product.controller.js";
 import { createProductValidator, updateProductValidator } from "../validatores/product.validator.js";
 
@@ -25,6 +25,7 @@ router.post(
 
 router.get("/get-seller-products", authProduct, getMyProducts);
 router.get("/allproducts", getAllProducts);
+router.get("/search", searchProducts);
 router.get("/:id", getProductById); 
 
 router.put(

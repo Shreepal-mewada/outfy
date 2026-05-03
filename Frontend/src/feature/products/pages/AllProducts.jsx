@@ -6,6 +6,7 @@ import { useProduct } from "../hooks/useProduct";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useCart } from "../../cart/hooks/useCart";
 import { ShoppingBag, Search, ShoppingCart } from "lucide-react";
+import GlobalSearch from "../../../components/common/GlobalSearch";
 
 const CATEGORIES = ["All", "Men", "Women", "Kids", "Unisex"];
 const SORT_OPTIONS = [
@@ -85,6 +86,7 @@ function InlineNav({
 
         {/* Right actions */}
         <div className="flex items-center space-x-5 text-stone-700">
+          <GlobalSearch />
           {/* Cart icon with badge */}
           <Link
             to="/cart"

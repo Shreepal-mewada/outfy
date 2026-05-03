@@ -285,3 +285,29 @@ export async function getAllProducts(req, res) {
   }
 }
 
+export async function searchProducts(req, res) {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(200).json({ success: true, products: [] });
+    }
+
+    const regex = new RegExp(q, "i");
+    const products = await ProductModel.find({
+      isActive: true,
+      $or: [
+        { title: { $regex: regex } },
+        { brandName: { $regex: regex } },
+        { category: { $regex: regex } }
+      ]
+    })
+    .limit(8)
+    .select("title images image finalPrice priceAmount originalPrice category gender"); // Select only necessary fields for search suggestion
+
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
+
