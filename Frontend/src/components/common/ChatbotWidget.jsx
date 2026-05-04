@@ -1,6 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, Loader2, ShoppingBag, Bot } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Send,
+  Loader2,
+  ShoppingBag,
+  Bot,
+} from "lucide-react";
 import { sendChatMessage } from "../../feature/chatbot/services/chatbot.api";
 
 // ─── Markdown-lite renderer ──────────────────────────────────────────────────
@@ -21,7 +28,7 @@ function FormattedMessage({ text }) {
                 </strong>
               ) : (
                 part
-              )
+              ),
             )}
           </p>
         );
@@ -32,7 +39,8 @@ function FormattedMessage({ text }) {
 
 // ─── Product Card inside chat ─────────────────────────────────────────────────
 function ProductCard({ product }) {
-  const price = product.finalPrice || product.priceAmount || product.originalPrice;
+  const price =
+    product.finalPrice || product.priceAmount || product.originalPrice;
   const image = product.images?.[0]?.url || product.image || null;
   return (
     <a
@@ -93,11 +101,7 @@ function MessageBubble({ msg }) {
               : "bg-[#1A1C19] text-white rounded-tr-sm"
           }`}
         >
-          {isBot ? (
-            <FormattedMessage text={msg.text} />
-          ) : (
-            <p>{msg.text}</p>
-          )}
+          {isBot ? <FormattedMessage text={msg.text} /> : <p>{msg.text}</p>}
         </div>
 
         {/* Product cards */}
@@ -141,7 +145,7 @@ const INITIAL_QUICK_ACTIONS = [
 const WELCOME_MESSAGE = {
   id: "welcome",
   role: "bot",
-  text: "👋 Hi! I'm **Outfy Assistant** — your personal shopping helper!\n\nHow can I help you today?",
+  text: "Hi! I'm **Outfy Assistant** — your personal shopping helper!\n\nHow can I help you today?",
   products: [],
   quickActions: INITIAL_QUICK_ACTIONS,
 };
@@ -218,13 +222,13 @@ export default function ChatbotWidget() {
 
   // Attach onQuickAction to all bot messages so chips always work
   const messagesWithActions = messages.map((msg) =>
-    msg.role === "bot" ? { ...msg, onQuickAction: handleQuickAction } : msg
+    msg.role === "bot" ? { ...msg, onQuickAction: handleQuickAction } : msg,
   );
 
   return (
     <>
       {/* ── Floating Trigger Button ── */}
-      <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-3">
+      <div className="fixed bottom-10 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-3">
         {/* Tooltip — desktop only */}
         <AnimatePresence>
           {!isOpen && (
@@ -234,7 +238,7 @@ export default function ChatbotWidget() {
               exit={{ opacity: 0, y: 10, scale: 0.8 }}
               className="hidden md:block bg-white border border-stone-200 rounded-2xl px-4 py-2.5 shadow-lg text-[11px] text-[#1A1C19] tracking-wide whitespace-nowrap"
             >
-              👋 Need help? Chat with us!
+              Need help? Chat with us!
             </motion.div>
           )}
         </AnimatePresence>
@@ -242,18 +246,30 @@ export default function ChatbotWidget() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={() => setIsOpen((v) => !v)}
-          className="w-13 h-13 sm:w-14 sm:h-14 bg-[#1A1C19] rounded-full shadow-2xl flex items-center justify-center text-white cursor-pointer relative hover:bg-[#2d3028] transition-colors"
-          style={{ width: 52, height: 52 }}
+          className="w-10 h-10 sm:w-14 sm:h-14 bg-[#1A1C19] rounded-full shadow-2xl flex items-center justify-center text-white cursor-pointer relative hover:bg-[#2d3028] transition-colors"
+          style={{ width: 40, height: 40 }}
           aria-label="Open chat"
         >
           <AnimatePresence mode="wait">
             {isOpen ? (
-              <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <X size={20} />
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X size={16} className="sm:w-5 sm:h-5" />
               </motion.div>
             ) : (
-              <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <MessageCircle size={20} />
+              <motion.div
+                key="open"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <MessageCircle size={16} className="sm:w-5 sm:h-5" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -288,10 +304,14 @@ export default function ChatbotWidget() {
                 <Bot size={18} />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold tracking-wide">Outfy Assistant</p>
+                <p className="text-sm font-semibold tracking-wide">
+                  Outfy Assistant
+                </p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                  <p className="text-[10px] text-white/60 uppercase tracking-widest">Online · Always here to help</p>
+                  <p className="text-[10px] text-white/60 uppercase tracking-widest">
+                    Online · Always here to help
+                  </p>
                 </div>
               </div>
               <button
@@ -320,9 +340,18 @@ export default function ChatbotWidget() {
                   </div>
                   <div className="bg-white border border-stone-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                      <span
+                        className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0ms" }}
+                      />
+                      <span
+                        className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "150ms" }}
+                      />
+                      <span
+                        className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "300ms" }}
+                      />
                     </div>
                   </div>
                 </motion.div>

@@ -49,43 +49,16 @@ function InlineNav({
       }`}
     >
       <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
-        {/* Left links */}
-        <div className="hidden md:flex space-x-8 text-[11px] uppercase tracking-widest font-semibold text-stone-600">
-          <Link to="/products" className="text-[#1A1C19] relative group">
-            Shop
-            <span className="absolute left-0 bottom-[-4px] w-full h-[1px] bg-[#1A1C19]" />
-          </Link>
-          {["Men", "Women", "Kids"].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className="hover:text-[#1A1C19] transition-colors relative group cursor-pointer"
-            >
-              {cat.toUpperCase()}
-              <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#1A1C19] transition-all duration-300 group-hover:w-full" />
-            </button>
-          ))}
-          {(user?.isSeller || user?.role === "seller") && (
-            <Link
-              to="/seller"
-              className="text-[#827668] hover:text-[#1A1C19] transition-colors relative group font-bold tracking-widest"
-            >
-              Dashboard
-              <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-[#827668] transition-all duration-300 group-hover:w-full group-hover:bg-[#1A1C19]" />
-            </Link>
-          )}
-        </div>
-
-        {/* Logo */}
+        {/* Logo - shifted to left */}
         <Link
           to="/"
-          className="text-2xl md:text-3xl tracking-tighter text-[#1A1C19] ml-0 md:-ml-20"
+          className="text-2xl md:text-3xl tracking-tighter text-[#1A1C19]"
         >
           OUTFY<span className="text-red-500">.</span>
         </Link>
 
         {/* Right actions */}
-        <div className="flex items-center space-x-5 text-stone-700">
+        <div className="flex items-center space-x-3 text-stone-700">
           <GlobalSearch />
           {/* Cart icon with badge */}
           <Link
@@ -119,7 +92,12 @@ function InlineNav({
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="text-[12px] font-semibold text-[#1A1C19] uppercase tracking-wider hover:text-[#827668] transition-colors flex items-center gap-1 cursor-pointer"
               >
-                {user.fullname || "User"}
+                <span className="md:hidden">
+                  {(user.fullname || "User").charAt(0).toUpperCase()}
+                </span>
+                <span className="hidden md:inline">
+                  {user.fullname || "User"}
+                </span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className={`h-4 w-4 transition-transform duration-300 ${isProfileOpen ? "rotate-180" : ""}`}
@@ -163,20 +141,12 @@ function InlineNav({
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-4 text-[11px] uppercase tracking-widest">
-              <Link
-                to="/login"
-                className="hover:text-[#1A1C19] transition-colors text-stone-500"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="bg-[#1A1C19] text-white px-4 py-1.5 rounded-full hover:bg-[#827668] transition-colors"
-              >
-                Register
-              </Link>
-            </div>
+            <Link
+              to="/login"
+              className="flex items-center text-[11px] font-semibold uppercase tracking-widest text-[#1A1C19] hover:text-[#827668] transition-colors duration-300 ml-1 py-1.5 px-6 border border-[#1A1C19] rounded-full hover:border-[#827668]"
+            >
+              Sign In
+            </Link>
           )}
         </div>
       </div>
@@ -342,28 +312,6 @@ function AllProducts() {
 
       <div className="pt-24">
         {/* ── Page Header ── */}
-        <div className="px-6 md:px-16 pt-10 pb-8 border-b border-stone-200/70">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-          >
-            <p className="text-[10px] uppercase tracking-[0.6em] text-[#827668] mb-3">
-              Outfy Store
-            </p>
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-              <h1
-                className="text-4xl md:text-5xl font-semibold uppercase tracking-[0.1em] text-[#1A1C19] font-BlinkMacSystemFont"
-                // style={{ fontFamily: "'Cormorant Garamond', 'Georgia', serif" }}
-              >
-                All Products
-              </h1>
-              <span className="text-[11px] uppercase tracking-[0.4em] text-stone-400">
-                {filtered.length} item{filtered.length !== 1 ? "s" : ""}
-              </span>
-            </div>
-          </motion.div>
-        </div>
 
         {/* ── Toolbar ── */}
         <div className="sticky top-16 z-30 bg-[#FAF9F7]/90 backdrop-blur-md border-b border-stone-200/70">

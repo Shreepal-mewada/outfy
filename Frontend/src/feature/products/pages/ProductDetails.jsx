@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector } from "react-redux";
+import { createOrder, verifyPayment } from "../../payment/services/payment.api";
+import { loadRazorpay } from "../../../utils/loadRazorpay";
 
 // ── tiny helper ──────────────────────────────────────────────────
 // function SpecRow({ label, value }) {
@@ -44,6 +46,8 @@ export default function ProductDetails() {
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [feedbackType, setFeedbackType] = useState("success"); // 'success' or 'already-added'
   const [isInCart, setIsInCart] = useState(false);
+  const [showSizeModal, setShowSizeModal] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const user = useSelector((state) => state.auth?.user);
   const cart = useSelector((state) => state.cart?.items || []);
   const totalCartItems = cart.length;
@@ -76,7 +80,8 @@ export default function ProductDetails() {
       const itemInCart = cart.some(
         (item) =>
           (item.product?._id === product?._id ||
-          item.product?.id === product?.id) && (!product?.sizes?.length || item.size === selectedSize),
+            item.product?.id === product?.id) &&
+          (!product?.sizes?.length || item.size === selectedSize),
       );
       setIsInCart(itemInCart);
     }
@@ -84,7 +89,9 @@ export default function ProductDetails() {
 
   const isItemInCart = cart.some(
     (item) =>
-      (item.product?._id === product?._id || item.product?.id === product?.id) && (!product?.sizes?.length || item.size === selectedSize),
+      (item.product?._id === product?._id ||
+        item.product?.id === product?.id) &&
+      (!product?.sizes?.length || item.size === selectedSize),
   );
 
   const handleAddToCartClick = async () => {
@@ -94,7 +101,7 @@ export default function ProductDetails() {
     }
 
     if (product.sizes?.length > 0 && !selectedSize) {
-      alert("Please select a size before adding to cart.");
+      setShowSizeModal(true);
       return;
     }
 
@@ -116,6 +123,85 @@ export default function ProductDetails() {
       console.error("Add to cart failed:", err);
     } finally {
       setAddingToCart(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!user) {
+      alert("Please login to proceed with the payment.");
+      navigate("/login");
+      return;
+    }
+
+    if (product.sizes?.length > 0 && !selectedSize) {
+      setShowSizeModal(true);
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    const res = await loadRazorpay();
+
+    if (!res) {
+      alert("Razorpay SDK failed to load. Are you online?");
+      setIsProcessingPayment(false);
+      return;
+    }
+
+    try {
+      const orderData = await createOrder();
+
+      if (!orderData || !orderData.order) {
+        alert("Server error. Please try again.");
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      const options = {
+        key: orderData.key_id,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: "Outfy Store",
+        description: "Test Transaction",
+        order_id: orderData.order.id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            if (verifyRes.success) {
+              alert("Payment Successful!");
+              navigate("/");
+            } else {
+              alert("Payment verification failed.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Error verifying payment.");
+          }
+        },
+        prefill: {
+          name: user.fullname || "",
+          email: user.email || "",
+          contact: user.phone || "9999999999",
+        },
+        theme: {
+          color: "#1A1C19",
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.on("payment.failed", function (response) {
+        alert("Payment Failed: " + response.error.description);
+      });
+      paymentObject.open();
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to create order.");
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -191,12 +277,14 @@ export default function ProductDetails() {
           className="flex items-center gap-2 text-[10px] md:text-xs uppercase tracking-widest text-[#827668] hover:text-[#1A1C19] transition-colors font-bold"
         >
           <ArrowLeft className="w-4 h-4 md:w-3.5 md:h-3.5" />
-          <span className="hidden sm:inline">{isSeller ? "Back to Dashboard" : "Back to Shop"}</span>
+          <span className="hidden sm:inline">
+            {isSeller ? "Back to Dashboard" : "Back to Shop"}
+          </span>
           <span className="sm:hidden">Back</span>
         </Link>
         <div className="flex items-center gap-4">
           <div className="hidden md:block text-[10px] uppercase tracking-[0.2em] font-bold text-stone-400">
-            {isSeller ? "Seller Preview Mode" : "Product Details"}
+            {isSeller ? "Seller Preview Mode" : ""}
           </div>
           <Link
             to="/cart"
@@ -353,7 +441,9 @@ export default function ProductDetails() {
                       }`}
                     >
                       {s.size}
-                      <span className={`text-[10px] ${selectedSize === s.size ? "opacity-80" : "opacity-50"}`}>
+                      <span
+                        className={`text-[10px] ${selectedSize === s.size ? "opacity-80" : "opacity-50"}`}
+                      >
                         ({s.stock})
                       </span>
                     </button>
@@ -375,7 +465,9 @@ export default function ProductDetails() {
                       className="flex items-center justify-between text-sm py-1 border-b border-[#EAE8E3] border-dashed sm:last:border-b-0"
                     >
                       <span className="text-stone-500 font-light">{label}</span>
-                      <span className="text-[#1A1C19] font-medium text-right ml-4">{value}</span>
+                      <span className="text-[#1A1C19] font-medium text-right ml-4">
+                        {value}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -438,27 +530,45 @@ export default function ProductDetails() {
                   Out of Stock
                 </button>
               ) : (
-                <button
-                  onClick={handleAddToCartClick}
-                  disabled={addingToCart || isInCart}
-                  className={`w-full flex items-center justify-center gap-2 py-3.5 sm:py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 shadow-lg shadow-stone-200 ${
-                    isInCart
-                      ? "bg-green-500 text-white cursor-not-allowed"
-                      : "bg-[#1A1C19] text-white hover:bg-[#2d3028] active:scale-[0.98] disabled:opacity-60"
-                  }`}
-                >
-                  {addingToCart ? (
-                    <span className="w-5 h-5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : isInCart ? (
-                    <>
-                      <span>✓</span> Added to Cart
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> Add to Cart
-                    </>
-                  )}
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddToCartClick}
+                    disabled={addingToCart || isInCart}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3.5 sm:py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 shadow-lg shadow-stone-200 ${
+                      isInCart
+                        ? "bg-green-500 text-white cursor-not-allowed"
+                        : "bg-[#1A1C19] text-white hover:bg-[#2d3028] active:scale-[0.98] disabled:opacity-60"
+                    }`}
+                  >
+                    {addingToCart ? (
+                      <span className="w-5 h-5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : isInCart ? (
+                      <>
+                        <span>✓</span> Added
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-4 h-4 sm:w-3.5 sm:h-3.5" />{" "}
+                        Add to Cart
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={handleBuyNow}
+                    disabled={isProcessingPayment}
+                    className="flex-1 bg-[#827668] text-white flex items-center justify-center gap-2 py-3.5 sm:py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#6b5b4f] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-stone-200 disabled:opacity-60"
+                  >
+                    {isProcessingPayment ? (
+                      <>
+                        <span className="w-5 h-5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      "Buy Now"
+                    )}
+                  </button>
+                </div>
               )}
               {!user && (
                 <p className="text-center text-[9px] uppercase tracking-wider text-stone-400 pb-1 lg:pb-0">
@@ -495,72 +605,129 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            {/* Horizontal scroll strip */}
-            <div
-              className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory"
-              style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
-            >
-              {moreProducts.map((p) => {
-                const pid = p._id || p.id;
-                const thumb =
-                  p.images?.[0]?.url ||
-                  p.images?.[0] ||
-                  "/outfy-fashion-model.png";
-                const pDiscount = p.discountPercentage > 0;
-                const pCurrency = p.currency || "INR";
-                const pPrice =
-                  p.finalPrice ||
-                  Math.round(
-                    p.originalPrice -
-                      p.originalPrice * (p.discountPercentage / 100),
-                  );
+            {/* Multiple horizontal scroll rows */}
+            <div className="space-y-8">
+              {/* Split products into 3 rows */}
+              {[0, 1, 2].map((rowIndex) => {
+                const rowProducts = moreProducts.filter(
+                  (_, index) => index % 3 === rowIndex,
+                );
 
                 return (
-                  <motion.button
-                    key={pid}
-                    onClick={() => navigate(`/product/${pid}`)}
-                    whileHover={{ y: -4 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex-none w-44 snap-start group text-left"
-                  >
-                    {/* Image */}
-                    <div className="aspect-[3/4] rounded-xl overflow-hidden bg-[#EAE8E3] mb-3 relative">
-                      <img
-                        src={thumb}
-                        alt={p.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      {pDiscount && (
-                        <span className="absolute top-2 left-2 bg-[#1A1C19] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                          -{p.discountPercentage}%
-                        </span>
-                      )}
-                    </div>
+                  <div key={rowIndex} className="space-y-4">
+                    <div
+                      className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory"
+                      style={{
+                        msOverflowStyle: "none",
+                        scrollbarWidth: "none",
+                      }}
+                    >
+                      {rowProducts.map((p) => {
+                        const pid = p._id || p.id;
+                        const thumb =
+                          p.images?.[0]?.url ||
+                          p.images?.[0] ||
+                          "/outfy-fashion-model.png";
+                        const pDiscount = p.discountPercentage > 0;
+                        const pCurrency = p.currency || "INR";
+                        const pPrice =
+                          p.finalPrice ||
+                          Math.round(
+                            p.originalPrice -
+                              p.originalPrice * (p.discountPercentage / 100),
+                          );
 
-                    {/* Info */}
-                    <p className="text-xs font-medium text-[#1A1C19] truncate leading-tight">
-                      {p.title}
-                    </p>
-                    <p className="text-[10px] text-stone-400 uppercase tracking-widest truncate mb-1">
-                      {p.category || "General"}
-                    </p>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-[#1A1C19]">
-                        {pCurrency} {pPrice}
-                      </span>
-                      {pDiscount && (
-                        <span className="text-[10px] text-stone-400 line-through">
-                          {p.originalPrice}
-                        </span>
-                      )}
+                        return (
+                          <motion.button
+                            key={pid}
+                            onClick={() => navigate(`/product/${pid}`)}
+                            whileHover={{ y: -4 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex-none w-44 snap-start group text-left"
+                          >
+                            {/* Image */}
+                            <div className="aspect-[3/4] rounded-xl overflow-hidden bg-[#EAE8E3] mb-3 relative">
+                              <img
+                                src={thumb}
+                                alt={p.title}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              />
+                              {pDiscount && (
+                                <span className="absolute top-2 left-2 bg-[#1A1C19] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                                  -{p.discountPercentage}%
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Info */}
+                            <p className="text-xs font-medium text-[#1A1C19] truncate leading-tight">
+                              {p.title}
+                            </p>
+                            <p className="text-[10px] text-stone-400 uppercase tracking-widest truncate mb-1">
+                              {p.category || "General"}
+                            </p>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-[#1A1C19]">
+                                {pCurrency} {pPrice}
+                              </span>
+                              {pDiscount && (
+                                <span className="text-[10px] text-stone-400 line-through">
+                                  {p.originalPrice}
+                                </span>
+                              )}
+                            </div>
+                          </motion.button>
+                        );
+                      })}
                     </div>
-                  </motion.button>
+                  </div>
                 );
               })}
             </div>
           </motion.section>
         )}
       </main>
+
+      {/* Size Selection Modal */}
+      <AnimatePresence>
+        {showSizeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowSizeModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-[#1A1C19] rounded-full flex items-center justify-center">
+                    <Ruler className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-semibold text-[#1A1C19] text-center mb-2">
+                  Size Required
+                </h3>
+                <p className="text-[11px] uppercase tracking-widest text-stone-500 text-center mb-6">
+                  Please select a size before adding this item to your cart
+                </p>
+                <button
+                  onClick={() => setShowSizeModal(false)}
+                  className="w-full bg-[#1A1C19] text-white py-3 rounded-full hover:bg-[#827668] transition-colors text-[11px] uppercase tracking-widest font-semibold"
+                >
+                  Got it
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

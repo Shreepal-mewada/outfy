@@ -41,9 +41,9 @@ const Hero = () => {
           scrolled
             ? "bg-[#FAF8F5]/90 backdrop-blur-md shadow-sm py-4"
             : "bg-transparent py-6"
-        }`}
+        } overflow-visible`}
       >
-        <div className="container mx-auto px-6 md:px-22 flex justify-between items-center">
+        <div className="container mx-auto px-6 md:px-22 flex justify-between items-center overflow-visible">
           <div className="hidden md:flex space-x-8 text-[11px] uppercase tracking-widest font-semibold text-stone-600">
             <Link
               to="/products"
@@ -91,7 +91,7 @@ const Hero = () => {
             OUTFY<span className="text-red-500">.</span>
           </Link>
 
-          <div className="flex space-x-5 text-stone-700">
+          <div className="flex items-center space-x-3 text-stone-700">
             <GlobalSearch />
             <Link
               to="/cart"
@@ -125,7 +125,12 @@ const Hero = () => {
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="text-[12px] font-semibold text-[#1A1C19] uppercase tracking-wider hover:text-[#827668] transition-colors flex items-center gap-1 cursor-pointer"
                 >
-                  {user.fullname || "User"}
+                  <span className="md:hidden">
+                    {(user.fullname || "User").charAt(0).toUpperCase()}
+                  </span>
+                  <span className="hidden md:inline">
+                    {user.fullname || "User"}
+                  </span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-4 w-4 transition-transform duration-300 ${isProfileOpen ? "rotate-180" : ""}`}
