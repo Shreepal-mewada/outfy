@@ -46,9 +46,12 @@ app.use("/api/cart", cartRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/chatbot", chatbotRouter);
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: Date.now() });
+});
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
-
 });
 
 export default app;
