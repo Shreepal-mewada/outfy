@@ -1,4 +1,5 @@
-import Razorpay from "Razorpay";
+// import Razorpay from "Razorpay";
+import Razorpay from "razorpay";
 import crypto from "crypto";
 import OrderModel from "../models/order.model.js";
 import CartModel from "../models/cart.model.js";
