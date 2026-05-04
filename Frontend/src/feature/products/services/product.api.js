@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const productInstance = axios.create({
-     baseURL : "http://localhost:3000/api/products",
+     baseURL : "https://outfy-backend.onrender.com/api/products",
      withCredentials : true,
 });
 

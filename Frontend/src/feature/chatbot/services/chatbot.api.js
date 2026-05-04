@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const chatbotInstance = axios.create({
-  baseURL: "http://localhost:3000/api/chatbot",
+  baseURL: "https://outfy-backend.onrender.com/api/chatbot",
   withCredentials: true,
 });
 

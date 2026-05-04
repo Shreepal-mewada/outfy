@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const cartInstance = axios.create({
-     baseURL : "http://localhost:3000/api/cart",
+     baseURL : "https://outfy-backend.onrender.com/api/cart",
      withCredentials : true,
 });
 

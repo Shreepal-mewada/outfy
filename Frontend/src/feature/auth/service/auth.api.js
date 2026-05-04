@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const bseURL = axios.create({
-  baseURL: "http://localhost:3000/api/auth",
+  baseURL: "https://outfy-backend.onrender.com/api/auth",
   withCredentials: true,
 });
 

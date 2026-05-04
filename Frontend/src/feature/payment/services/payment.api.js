@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const paymentInstance = axios.create({
-  baseURL: "http://localhost:3000/api/payment",
+  baseURL: "https://outfy-backend.onrender.com/api/payment",
   withCredentials: true,
 });
 
