@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Users,
   Truck,
-  Store
+  Store,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -60,9 +60,6 @@ function MainSellerPage() {
             className="flex items-center gap-2 text-2xl md:text-3xl tracking-tighter text-[#1A1C19] font-BlinkMacSystemFont"
           >
             OUTFY
-            <span className="text-stone-400 font-sans tracking-widest text-[10px] uppercase ml-1 mt-2">
-              Seller
-            </span>
           </Link>
 
           {/* Nav Actions */}
@@ -86,12 +83,18 @@ function MainSellerPage() {
 
             {user ? (
               <div className="relative">
-                {/* Only Name shown, clickable */}
+                {/* Only initial shown for seller dashboard */}
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="text-[12px] font-semibold text-[#1A1C19] uppercase tracking-wider hover:text-[#827668] transition-colors flex items-center gap-1 cursor-pointer"
+                  aria-label={user.fullname || "User"}
                 >
-                  {user.fullname || "User"}
+                  <span className="md:hidden">
+                    {(user.fullname || "User").charAt(0).toUpperCase()}
+                  </span>
+                  <span className="hidden md:inline">
+                    {user.fullname || "User"}
+                  </span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-4 w-4 transition-transform duration-300 ${isProfileOpen ? "rotate-180" : ""}`}
@@ -206,7 +209,7 @@ function MainSellerPage() {
             variants={fadeUp}
             className="text-center font-BlinkMacSystemFont text-4xl tracking-tighter mb-16 text-[#1A1C19]"
           >
-            Platform Reach Across Categories
+            Platform Reach Across Clothing Categories
           </motion.h2>
 
           <motion.div
@@ -217,10 +220,10 @@ function MainSellerPage() {
             className="grid grid-cols-2 md:grid-cols-4 gap-6"
           >
             {[
-              { label: "Luxury Wear", stats: "High Demand", icon: "💎" },
-              { label: "Sneakers", stats: "Trending", icon: "👟" },
-              { label: "Accessories", stats: "Top Rated", icon: "🕶️" },
-              { label: "Outerwear", stats: "Seasonal", icon: "🧥" },
+              { label: "Women’s Wear", stats: "Best Seller", icon: "👗" },
+              { label: "Men’s Wear", stats: "Top Trend", icon: "👔" },
+              { label: "Kids’ Clothing", stats: "Growing Fast", icon: "🧸" },
+              { label: "Outerwear", stats: "Seasonal Favorite", icon: "🧥" },
             ].map((cat, idx) => (
               <motion.div
                 key={idx}

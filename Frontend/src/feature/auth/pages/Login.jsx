@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { useGoogleLogin } from "@react-oauth/google";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const { handleLogin, handleGoogleAuth } = useAuth();
@@ -13,6 +14,7 @@ const Login = () => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const googleLoginFlow = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -59,7 +61,7 @@ const Login = () => {
     setIsLoading(false);
 
     if (response && response.success) {
-      if (response.user?.isSeller) {
+      if (response.user?.role === "seller") {
         navigate("/seller");
       } else {
         navigate("/");
@@ -183,27 +185,36 @@ const Login = () => {
             </div>
 
             {/* Password */}
-            <div className="group">
+            <div className="group relative">
               <label
                 className="block text-[10px] uppercase tracking-widest text-stone-500 mb-1"
                 htmlFor="password"
               >
                 Password
               </label>
-              <input
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full bg-transparent border-0 border-b py-2 px-0 text-sm text-[#1A1C19] placeholder:text-stone-400 focus:outline-none focus:ring-0 transition-colors duration-300 ${
-                  errors.password
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-stone-300 focus:border-[#7d7164]"
-                }`}
-                id="password"
-                name="password"
-                placeholder="••••••••••••"
-                type="password"
-                required
-              />
+              <div className="relative">
+                <input
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full bg-transparent border-0 border-b py-2 px-0 pr-8 text-sm text-[#1A1C19] placeholder:text-stone-400 focus:outline-none focus:ring-0 transition-colors duration-300 ${
+                    errors.password
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-stone-300 focus:border-[#7d7164]"
+                  }`}
+                  id="password"
+                  name="password"
+                  placeholder="••••••••••••"
+                  type={showPassword ? "text" : "password"}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-[10px] text-red-500 mt-1 uppercase tracking-wider">
                   {errors.password}
