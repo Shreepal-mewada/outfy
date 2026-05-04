@@ -1,23 +1,39 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  MessageCircle,
-  X,
+  ChevronLeft,
   Send,
   Loader2,
   ShoppingBag,
   Bot,
+  MessageCircle,
+  X,
 } from "lucide-react";
 import { sendChatMessage } from "../../feature/chatbot/services/chatbot.api";
 
-// ─── Markdown-lite renderer ──────────────────────────────────────────────────
-// Converts **bold**, bullet points (•), and \n into styled spans/divs
+// Site theme
+const THEME = {
+  primary: "#1A1C19",       // deep charcoal — nav/buttons
+  primaryHover: "#2d3028",  // slightly lighter charcoal
+  accent: "#827668",        // warm stone — secondary text
+  accentLight: "#F5F3F0",   // warm off-white background
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function getTime() {
+  return new Date().toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+// ─── Markdown-lite renderer ───────────────────────────────────────────────────
 function FormattedMessage({ text }) {
   const lines = text.split("\n");
   return (
     <div className="space-y-1">
       {lines.map((line, i) => {
-        // Bold segments
         const parts = line.split(/\*\*(.*?)\*\*/g);
         return (
           <p key={i} className="leading-relaxed">
@@ -37,7 +53,7 @@ function FormattedMessage({ text }) {
   );
 }
 
-// ─── Product Card inside chat ─────────────────────────────────────────────────
+// ─── Product Card inside chat ──────────────────────────────────────────────────
 function ProductCard({ product }) {
   const price =
     product.finalPrice || product.priceAmount || product.originalPrice;
@@ -45,9 +61,9 @@ function ProductCard({ product }) {
   return (
     <a
       href={`/product/${product._id}`}
-      className="flex items-center gap-3 p-2.5 bg-[#F5F3F0] hover:bg-stone-200 rounded-xl transition-colors group"
+      className="flex items-center gap-3 p-2.5 bg-white border border-stone-100 hover:border-stone-300 hover:shadow-sm rounded-xl transition-all duration-200 group"
     >
-      <div className="w-12 h-14 flex-shrink-0 bg-stone-200 rounded-lg overflow-hidden">
+      <div className="w-12 h-14 flex-shrink-0 bg-stone-100 rounded-lg overflow-hidden">
         {image ? (
           <img
             src={image}
@@ -61,52 +77,66 @@ function ProductCard({ product }) {
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] uppercase tracking-widest text-[#827668] truncate">
-          {product.category || product.gender}
+        <p className="text-[10px] text-[#827668] truncate capitalize">
+          {product.category || product.gender || "Fashion"}
         </p>
-        <h4 className="text-xs font-medium text-[#1A1C19] truncate leading-snug">
+        <h4 className="text-xs font-medium text-[#1A1C19] truncate leading-snug mt-0.5">
           {product.title}
         </h4>
-        <p className="text-xs font-bold text-[#1A1C19] mt-0.5">
+        <p className="text-sm font-bold text-[#1A1C19] mt-0.5">
           ₹{price?.toLocaleString("en-IN")}
         </p>
       </div>
-      <span className="text-[9px] uppercase tracking-widest text-[#827668] flex-shrink-0">
+      <span className="text-[10px] font-medium text-[#827668] flex-shrink-0 group-hover:text-[#1A1C19] transition-colors">
         View →
       </span>
     </a>
   );
 }
 
-// ─── Individual Message Bubble ─────────────────────────────────────────────────
+// ─── Message Bubble ───────────────────────────────────────────────────────────
 function MessageBubble({ msg }) {
   const isBot = msg.role === "bot";
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={`flex ${isBot ? "justify-start" : "justify-end"} gap-2`}
+      transition={{ duration: 0.25 }}
+      className={`flex ${isBot ? "justify-start" : "justify-end"} gap-2 px-4`}
     >
+      {/* Bot avatar */}
       {isBot && (
-        <div className="w-7 h-7 flex-shrink-0 bg-[#1A1C19] rounded-full flex items-center justify-center mt-0.5">
+        <div
+          className="w-7 h-7 flex-shrink-0 rounded-full flex items-center justify-center mt-0.5 shadow-sm"
+          style={{ background: THEME.primary }}
+        >
           <Bot size={13} className="text-white" />
         </div>
       )}
-      <div className={`max-w-[80%] ${isBot ? "" : "order-first"}`}>
+
+      <div className={`max-w-[78%] ${isBot ? "" : "items-end"} flex flex-col`}>
+        {/* Bubble */}
         <div
-          className={`rounded-2xl px-4 py-3 text-[12px] leading-relaxed ${
+          className={`rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm ${
             isBot
-              ? "bg-white border border-stone-100 text-[#1A1C19] rounded-tl-sm shadow-sm"
-              : "bg-[#1A1C19] text-white rounded-tr-sm"
+              ? "bg-white border border-stone-100 text-[#1A1C19] rounded-tl-sm"
+              : "text-white rounded-tr-sm"
           }`}
+          style={!isBot ? { background: THEME.primary } : {}}
         >
           {isBot ? <FormattedMessage text={msg.text} /> : <p>{msg.text}</p>}
         </div>
 
+        {/* Timestamp */}
+        {msg.time && (
+          <span className="text-[10px] text-stone-400 mt-1 mx-1">
+            {msg.time}
+          </span>
+        )}
+
         {/* Product cards */}
         {isBot && msg.products?.length > 0 && (
-          <div className="mt-2 space-y-2">
+          <div className="mt-2 space-y-2 w-full">
             {msg.products.map((p) => (
               <ProductCard key={p._id} product={p} />
             ))}
@@ -120,7 +150,7 @@ function MessageBubble({ msg }) {
               <button
                 key={action.value}
                 onClick={() => msg.onQuickAction?.(action.value)}
-                className="text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-stone-200 bg-white hover:bg-[#1A1C19] hover:text-white hover:border-[#1A1C19] transition-all duration-200 text-stone-600 cursor-pointer"
+                className="text-[11px] font-medium px-3 py-1.5 rounded-full border border-stone-200 bg-[#F5F3F0] text-[#1A1C19] hover:bg-[#1A1C19] hover:text-white hover:border-[#1A1C19] transition-all duration-200 cursor-pointer"
               >
                 {action.label}
               </button>
@@ -132,7 +162,32 @@ function MessageBubble({ msg }) {
   );
 }
 
-// ─── Main Chatbot Widget ───────────────────────────────────────────────────────
+// ─── Typing Indicator ─────────────────────────────────────────────────────────
+function TypingIndicator() {
+  return (
+    <div className="flex justify-start gap-2 px-4">
+      <div
+        className="w-7 h-7 flex-shrink-0 rounded-full flex items-center justify-center shadow-sm"
+        style={{ background: THEME.primary }}
+      >
+        <Bot size={13} className="text-white" />
+      </div>
+      <div className="bg-white border border-stone-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+        <div className="flex items-center gap-1.5">
+          {[0, 150, 300].map((delay) => (
+            <span
+              key={delay}
+              className="w-2 h-2 bg-stone-400 rounded-full animate-bounce"
+              style={{ animationDelay: `${delay}ms` }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 const INITIAL_QUICK_ACTIONS = [
   { label: "📦 Track Order", value: "track my order" },
   { label: "🔄 Return / Exchange", value: "I want to return an item" },
@@ -148,8 +203,10 @@ const WELCOME_MESSAGE = {
   text: "Hi! I'm **Outfy Assistant** — your personal shopping helper!\n\nHow can I help you today?",
   products: [],
   quickActions: INITIAL_QUICK_ACTIONS,
+  time: getTime(),
 };
 
+// ─── Main Widget ──────────────────────────────────────────────────────────────
 export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
@@ -159,30 +216,39 @@ export default function ChatbotWidget() {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Auto-scroll to bottom whenever messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, loading]);
 
-  // Focus input on open
   useEffect(() => {
     if (isOpen) {
       setUnread(0);
-      setTimeout(() => inputRef.current?.focus(), 200);
+      setTimeout(() => inputRef.current?.focus(), 300);
     }
+  }, [isOpen]);
+
+  // Lock body scroll on mobile when open
+  useEffect(() => {
+    if (isOpen && window.innerWidth < 640) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
   const sendMessage = async (text) => {
     if (!text.trim() || loading) return;
 
-    const userMsg = { id: Date.now(), role: "user", text: text.trim() };
+    const userMsg = { id: Date.now(), role: "user", text: text.trim(), time: getTime() };
     setMessages((prev) => [...prev, userMsg]);
     setInputValue("");
     setLoading(true);
 
     try {
       const data = await sendChatMessage(text.trim());
-
       const botMsg = {
         id: Date.now() + 1,
         role: "bot",
@@ -190,9 +256,9 @@ export default function ChatbotWidget() {
         products: data.products || [],
         quickActions: data.quickActions || INITIAL_QUICK_ACTIONS,
         onQuickAction: handleQuickAction,
+        time: getTime(),
       };
       setMessages((prev) => [...prev, botMsg]);
-
       if (!isOpen) setUnread((prev) => prev + 1);
     } catch {
       setMessages((prev) => [
@@ -204,6 +270,7 @@ export default function ChatbotWidget() {
           products: [],
           quickActions: INITIAL_QUICK_ACTIONS,
           onQuickAction: handleQuickAction,
+          time: getTime(),
         },
       ]);
     } finally {
@@ -211,43 +278,157 @@ export default function ChatbotWidget() {
     }
   };
 
-  const handleQuickAction = (value) => {
-    sendMessage(value);
-  };
+  const handleQuickAction = (value) => sendMessage(value);
+  const handleSubmit = (e) => { e.preventDefault(); sendMessage(inputValue); };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    sendMessage(inputValue);
-  };
-
-  // Attach onQuickAction to all bot messages so chips always work
   const messagesWithActions = messages.map((msg) =>
     msg.role === "bot" ? { ...msg, onQuickAction: handleQuickAction } : msg,
   );
 
+  // ── Shared Chat Panel ────────────────────────────────────────────────────────
+  const ChatPanel = (
+    <div className="flex flex-col h-full bg-[#F5F3F0]">
+
+      {/* ── Header ── */}
+      <div className="flex-shrink-0 text-white shadow-md" style={{ background: THEME.primary }}>
+        <div className="flex items-center gap-3 px-3 py-3">
+          {/* Back button — mobile only */}
+          <button
+            onClick={() => setIsOpen(false)}
+            className="sm:hidden p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <ChevronLeft size={22} />
+          </button>
+
+          {/* Avatar */}
+          <div className="relative">
+            <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center ring-2 ring-white/20">
+              <Bot size={18} />
+            </div>
+            <span
+              className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2"
+              style={{ borderColor: THEME.primary }}
+            />
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-semibold leading-tight tracking-wide">
+              Outfy Assistant
+            </p>
+            <p className="text-[10px] text-white/60 leading-tight mt-0.5 uppercase tracking-widest">
+              Online · Replies instantly
+            </p>
+          </div>
+
+          {/* Desktop close */}
+          <button
+            onClick={() => setIsOpen(false)}
+            className="hidden sm:flex p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Trust strip */}
+        <div className="bg-black/20 px-4 py-1.5">
+          <span className="text-[10px] text-white/50 tracking-wide">
+            🔒 Secure · Powered by Outfy AI
+          </span>
+        </div>
+      </div>
+
+      {/* ── Messages ── */}
+      <div className="flex-1 overflow-y-auto py-4 space-y-3">
+        {/* Date divider */}
+        <div className="flex items-center gap-3 px-4">
+          <div className="flex-1 h-px bg-stone-200" />
+          <span className="text-[10px] text-stone-400 whitespace-nowrap">Today</span>
+          <div className="flex-1 h-px bg-stone-200" />
+        </div>
+
+        {messagesWithActions.map((msg) => (
+          <MessageBubble key={msg.id} msg={msg} />
+        ))}
+
+        {loading && <TypingIndicator />}
+        <div ref={bottomRef} className="h-1" />
+      </div>
+
+      {/* ── Input Bar ── */}
+      <div className="flex-shrink-0 bg-white border-t border-stone-200 px-3 py-2 pb-[env(safe-area-inset-bottom,8px)]">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Type a message…"
+            disabled={loading}
+            className="flex-1 bg-stone-100 rounded-full px-4 py-2.5 text-[13px] text-[#1A1C19] placeholder:text-stone-400 outline-none transition-all disabled:opacity-60 focus:ring-2 focus:ring-[#1A1C19]/30"
+          />
+          <button
+            type="submit"
+            disabled={!inputValue.trim() || loading}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-white cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all flex-shrink-0 shadow-md"
+            style={{ background: THEME.primary }}
+            aria-label="Send"
+          >
+            {loading ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <Send size={15} />
+            )}
+          </button>
+        </form>
+        <p className="text-center text-[9px] text-stone-300 uppercase tracking-widest mt-2">
+          Powered by Outfy · Always here to help
+        </p>
+      </div>
+    </div>
+  );
+
   return (
     <>
-      {/* ── Floating Trigger Button ── */}
-      <div className="fixed bottom-10 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-3">
-        {/* Tooltip — desktop only */}
+      {/* ── FAB ── */}
+      <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-2">
+        {/* Desktop tooltip pill */}
         <AnimatePresence>
           {!isOpen && (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.8 }}
-              className="hidden md:block bg-white border border-stone-200 rounded-2xl px-4 py-2.5 shadow-lg text-[11px] text-[#1A1C19] tracking-wide whitespace-nowrap"
+              initial={{ opacity: 0, x: 20, scale: 0.85 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 20, scale: 0.85 }}
+              transition={{ duration: 0.2 }}
+              className="hidden md:flex items-center gap-2 bg-white border border-stone-200 rounded-full pl-3 pr-4 py-2 shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+              onClick={() => setIsOpen(true)}
             >
-              Need help? Chat with us!
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ background: THEME.primary }}
+              >
+                <Bot size={12} className="text-white" />
+              </div>
+              <span className="text-[12px] font-medium text-[#1A1C19]">
+                Need help?
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
 
+        {/* FAB button */}
         <motion.button
-          whileTap={{ scale: 0.92 }}
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
           onClick={() => setIsOpen((v) => !v)}
-          className="w-10 h-10 sm:w-14 sm:h-14 bg-[#1A1C19] rounded-full shadow-2xl flex items-center justify-center text-white cursor-pointer relative hover:bg-[#2d3028] transition-colors"
-          style={{ width: 40, height: 40 }}
+          className="rounded-full shadow-xl flex items-center justify-center text-white cursor-pointer relative transition-colors"
+          style={{
+            width: 52,
+            height: 52,
+            background: isOpen ? THEME.primaryHover : THEME.primary,
+          }}
           aria-label="Open chat"
         >
           <AnimatePresence mode="wait">
@@ -257,9 +438,9 @@ export default function ChatbotWidget() {
                 initial={{ rotate: -90, opacity: 0 }}
                 animate={{ rotate: 0, opacity: 1 }}
                 exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.18 }}
               >
-                <X size={16} className="sm:w-5 sm:h-5" />
+                <X size={22} />
               </motion.div>
             ) : (
               <motion.div
@@ -267,17 +448,21 @@ export default function ChatbotWidget() {
                 initial={{ rotate: 90, opacity: 0 }}
                 animate={{ rotate: 0, opacity: 1 }}
                 exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.18 }}
               >
-                <MessageCircle size={16} className="sm:w-5 sm:h-5" />
+                <MessageCircle size={22} />
               </motion.div>
             )}
           </AnimatePresence>
 
           {unread > 0 && !isOpen && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow"
+            >
               {unread}
-            </span>
+            </motion.span>
           )}
         </motion.button>
       </div>
@@ -285,110 +470,32 @@ export default function ChatbotWidget() {
       {/* ── Chat Window ── */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className={
-              // Mobile: fixed full-screen bottom sheet  |  sm+: floating panel
-              "fixed z-50 bg-[#FAF9F7] border border-stone-200 shadow-2xl flex flex-col overflow-hidden " +
-              "inset-x-0 bottom-0 rounded-t-3xl " +
-              "sm:inset-x-auto sm:bottom-24 sm:right-6 sm:w-[380px] sm:max-w-[420px] sm:rounded-3xl"
-            }
-            style={{ height: "min(90dvh, 560px)" }}
-          >
-            {/* Header */}
-            <div className="bg-[#1A1C19] text-white px-5 py-4 flex items-center gap-3 flex-shrink-0">
-              <div className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center">
-                <Bot size={18} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold tracking-wide">
-                  Outfy Assistant
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                  <p className="text-[10px] text-white/60 uppercase tracking-widest">
-                    Online · Always here to help
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-white/60 hover:text-white transition-colors cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
+          <>
+            {/* MOBILE — full-screen slide-in */}
+            <motion.div
+              key="mobile-chat"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+              className="fixed inset-0 z-50 sm:hidden"
+            >
+              {ChatPanel}
+            </motion.div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
-              {messagesWithActions.map((msg) => (
-                <MessageBubble key={msg.id} msg={msg} />
-              ))}
-
-              {/* Loading indicator */}
-              {loading && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex justify-start gap-2"
-                >
-                  <div className="w-7 h-7 flex-shrink-0 bg-[#1A1C19] rounded-full flex items-center justify-center">
-                    <Bot size={13} className="text-white" />
-                  </div>
-                  <div className="bg-white border border-stone-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0ms" }}
-                      />
-                      <span
-                        className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "150ms" }}
-                      />
-                      <span
-                        className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "300ms" }}
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-              <div ref={bottomRef} />
-            </div>
-
-            {/* Input */}
-            <div className="border-t border-stone-200 px-3 py-3 flex-shrink-0 bg-white">
-              <form onSubmit={handleSubmit} className="flex items-center gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Type your message…"
-                  disabled={loading}
-                  className="flex-1 bg-[#FAF9F7] border border-stone-200 rounded-full px-4 py-2.5 text-[12px] text-[#1A1C19] placeholder:text-stone-400 outline-none focus:border-[#1A1C19] transition-colors disabled:opacity-60"
-                />
-                <button
-                  type="submit"
-                  disabled={!inputValue.trim() || loading}
-                  className="w-10 h-10 bg-[#1A1C19] rounded-full flex items-center justify-center text-white cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#2d3028] transition-colors flex-shrink-0"
-                  aria-label="Send"
-                >
-                  {loading ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <Send size={14} />
-                  )}
-                </button>
-              </form>
-              <p className="text-center text-[9px] text-stone-300 uppercase tracking-widest mt-2">
-                Powered by Outfy · Always here to help
-              </p>
-            </div>
-          </motion.div>
+            {/* DESKTOP — floating panel */}
+            <motion.div
+              key="desktop-chat"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="hidden sm:flex fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] rounded-2xl overflow-hidden shadow-2xl border border-stone-200 flex-col"
+              style={{ height: 540 }}
+            >
+              {ChatPanel}
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

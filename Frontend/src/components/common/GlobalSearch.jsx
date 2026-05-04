@@ -69,7 +69,7 @@ const GlobalSearch = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.2 }}
-            className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-20 sm:top-1/2 sm:-translate-y-1/2 flex items-center bg-white rounded-full border border-stone-200 shadow-lg overflow-hidden z-50 sm:w-48 md:w-56"
+            className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-20 sm:top-1/2 sm:-translate-y-1/2 flex items-center bg-white rounded-full border border-stone-200 shadow-lg z-50 sm:w-48 md:w-56"
           >
             <input
               type="text"
@@ -99,7 +99,7 @@ const GlobalSearch = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-[92px] sm:top-[calc(100%+16px)] sm:w-72 md:w-96 bg-white border border-stone-200 shadow-xl rounded-2xl overflow-hidden z-50"
+            className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-[136px] sm:top-[calc(100%+16px)] sm:w-72 md:w-96 bg-white border border-stone-200 shadow-xl rounded-2xl overflow-hidden z-50"
           >
             <div className="p-3 text-[10px] uppercase tracking-widest text-stone-400 border-b border-stone-100 flex justify-between items-center">
               <span>Suggestions</span>

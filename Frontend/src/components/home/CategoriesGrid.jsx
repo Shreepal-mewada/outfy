@@ -51,7 +51,7 @@ const cardVariants = {
 
 const CategoriesGrid = () => {
   return (
-    <section className="py-24 px-6 md:px-16 bg-white">
+    <section className="py-24 px-6 md:px-16 bg-[#FAF8F5]">
       {/* ── Section Header ── */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

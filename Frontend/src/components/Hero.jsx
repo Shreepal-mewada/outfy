@@ -92,6 +92,13 @@ const Hero = () => {
           </Link>
 
           <div className="flex items-center space-x-3 text-stone-700">
+            {/* Mobile-only Shop button */}
+            <Link
+              to="/products"
+              className="md:hidden flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[#1A1C19] border border-[#1A1C19]/30 rounded-full px-3 py-1.5 hover:bg-[#1A1C19] hover:text-white hover:border-[#1A1C19] transition-all duration-200"
+            >
+              Shop
+            </Link>
             <GlobalSearch />
             <Link
               to="/cart"
@@ -192,8 +199,16 @@ const Hero = () => {
         <ImageSlider
           autoPlay={true}
           interval={4000}
-          accentColor="#ffffff" // Since it's full dark mode, white/light accent looks better, or Outfy's gold
+          accentColor="#ffffff"
           showPagination={true}
+        />
+        {/* Gradient bridge — fades hero's dark bottom into the cream page background */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-20"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent 0%, #FAF8F5 100%)",
+          }}
         />
       </div>
 

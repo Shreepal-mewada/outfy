@@ -108,7 +108,7 @@ const LatestProducts = () => {
 
   return (
     <motion.section
-      className="py-24 bg-white overflow-hidden"
+      className="py-24 bg-[#FAF8F5] overflow-hidden"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-80px" }}
