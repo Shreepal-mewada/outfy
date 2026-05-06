@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
 import { Mail, Phone, ExternalLink } from "lucide-react";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+    setError("");
+    setSubscribed(true);
+  };
   return (
     <footer className="bg-[#4A3C31] text-[#FAF8F5] pt-16 pb-8 px-6 md:px-22">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
@@ -16,17 +29,28 @@ const Footer = () => {
             Exclusively styled online fashion store website design with all tools you might need.
           </p>
 
-          <form className="flex flex-col gap-3">
-            <input
-              type="email"
-              placeholder="Your Email"
-              className="bg-transparent border border-stone-500 rounded-full px-5 py-3 text-xs placeholder:text-stone-400 focus:outline-none focus:border-white transition-colors"
-            />
+          <form className="flex flex-col gap-3" onSubmit={handleSubscribe}>
+            {!subscribed && (
+              <input
+                type="email"
+                placeholder="Your Email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); setError(""); }}
+                className="bg-transparent border border-stone-500 rounded-full px-5 py-3 text-xs placeholder:text-stone-400 focus:outline-none focus:border-white transition-colors"
+              />
+            )}
+            {error && (
+              <p className="text-red-400 text-[10px] pl-2">{error}</p>
+            )}
             <button
               type="submit"
-              className="bg-white text-[#4A3C31] font-bold text-[10px] uppercase tracking-[0.2em] py-3.5 rounded-full hover:bg-stone-200 transition-colors w-full sm:w-max px-8"
+              disabled={subscribed}
+              className={`font-bold text-[10px] uppercase tracking-[0.2em] py-3.5 cursor-pointer rounded-full transition-colors w-full sm:w-max px-8 ${subscribed
+                ? "bg-green-500 text-white cursor-default"
+                : "bg-white text-[#4A3C31] hover:bg-stone-200"
+                }`}
             >
-              Subscribe
+              {subscribed ? "Subscribed ✓" : "Subscribe"}
             </button>
           </form>
           <p className="text-[9px] text-stone-400 mt-3">
